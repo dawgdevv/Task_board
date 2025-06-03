@@ -264,12 +264,6 @@ npm run dev
 
 This project is created for educational and demonstration purposes.
 
-## 📞 Contact
-
-- GitHub: [Your GitHub Profile]
-- Video Demo: [Your Loom/YouTube Link]
-- Live Demo: [Your Deployed App Link]
-
 ---
 
 **Project Timeline**: Completed within 3 days as per requirements
