@@ -68,36 +68,38 @@ Application design inspired by: [https://imgur.com/a/Yy754Ie](https://imgur.com/
 
 ## 🏗️ Project Structure
 
-```
+```plaintext
+
 reactjs-sample-0225/
 ├── backend/
-│   ├── config/
-│   │   └── db.js                 # Database connection
-│   ├── controllers/
-│   │   └── user.controller.js    # User authentication logic
-│   ├── middleware/
-│   │   └── auth.middleware.js    # JWT authentication middleware
-│   ├── models/
-│   │   ├── user.model.js         # User schema
-│   │   ├── task.model.js         # Task schema
-│   │   └── tasklist.model.js     # Task list schema
-│   ├── routes/
-│   │   ├── user.routes.js        # User routes
-│   │   └── task.routes.js        # Task routes
-│   └── index.js                  # Server entry point
+│ ├── config/
+│ │ └── db.js # Database connection
+│ ├── controllers/
+│ │ └── user.controller.js # User authentication logic
+│ ├── middleware/
+│ │ └── auth.middleware.js # JWT authentication middleware
+│ ├── models/
+│ │ ├── user.model.js # User schema
+│ │ ├── task.model.js # Task schema
+│ │ └── tasklist.model.js # Task list schema
+│ ├── routes/
+│ │ ├── user.routes.js # User routes
+│ │ └── task.routes.js # Task routes
+│ └── index.js # Server entry point
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ProfileIcon.jsx   # Random profile image component
-│   │   │   ├── TaskBoard.jsx     # Task list component
-│   │   │   └── TaskModal.jsx     # Task edit/delete modal
-│   │   ├── pages/
-│   │   │   ├── LoginPage.jsx     # Login interface
-│   │   │   ├── SignupPage.jsx    # Registration interface
-│   │   │   └── Dashboard.jsx     # Main dashboard
-│   │   └── App.jsx               # Main app component
-│   └── .env                      # Environment variables
+│ ├── src/
+│ │ ├── components/
+│ │ │ ├── ProfileIcon.jsx # Random profile image component
+│ │ │ ├── TaskBoard.jsx # Task list component
+│ │ │ └── TaskModal.jsx # Task edit/delete modal
+│ │ ├── pages/
+│ │ │ ├── LoginPage.jsx # Login interface
+│ │ │ ├── SignupPage.jsx # Registration interface
+│ │ │ └── Dashboard.jsx # Main dashboard
+│ │ └── App.jsx # Main app component
+│ └── .env # Environment variables
 └── README.md
+
 ```
 
 ## 🔧 Installation & Setup
