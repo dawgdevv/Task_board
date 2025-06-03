@@ -1,0 +1,99 @@
+# Dependencies
+node_modules
+/bower_components
+/vendor
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Build artifacts
+/dist
+/build
+/out
+/public
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-freeze.txt
+pip-selfcheck.json
+
+# Java specific
+*.class
+*.jar
+*.war
+*.ear
+target/
+.gradle
+build/
+hs_err_pid*
+
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+pkg/
+
+# Ruby specific
+.bundle/
+vendor/bundle/
+log/
+tmp/
+.sass-cache/
+capybara-*.html
+.rspec
+coverage/
+
+# PHP specific
+composer.phar
+vendor/
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+*.dump
+
+# Coverage reports
+coverage/
+.nyc_output/
