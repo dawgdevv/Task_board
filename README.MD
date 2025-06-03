@@ -237,17 +237,6 @@ npm run dev
 - Blockchain-based task verification
 - Decentralized user authentication
 
-## 🔄 Future Enhancements
-
-- [ ] Drag and drop task reordering
-- [ ] Task categories and tags
-- [ ] Due dates and reminders
-- [ ] Team collaboration features
-- [ ] Task attachments
-- [ ] Advanced filtering and search
-- [ ] Dark mode support
-- [ ] PWA capabilities
-
 ## 📝 Development Notes
 
 ### Assumptions Made
