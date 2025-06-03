@@ -6,7 +6,7 @@ A full-stack task management application built with React.js and Node.js/Express
 
 **Deployed Application**: [https://taskapp-blue.vercel.app/](https://taskapp-blue.vercel.app/)
 
-**Demo Video**: [Your Loom/YouTube Video Link Here]
+**Demo Video**: [Loom Link](https://www.loom.com/share/1127c4cf417344c684a496ffdc381ad6?sid=d4337315-99e0-40c7-9a8a-dbfc68a3c3b4)
 
 ## 📸 Screenshots
 
