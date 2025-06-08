@@ -7,7 +7,8 @@ import {
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import Dashboard from "./pages/Dashboard";
+import GoalsPage from "./pages/GoalsPage";
+import GoalDetailPage from "./pages/GoalDetailPage";
 
 function App() {
   return (
@@ -17,7 +18,10 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/goals" element={<GoalsPage />} />
+          <Route path="/goal/:goalId" element={<GoalDetailPage />} />
+          {/* Redirect dashboard to goals as the new entry point */}
+          <Route path="/dashboard" element={<Navigate to="/goals" replace />} />
         </Routes>
       </div>
     </Router>

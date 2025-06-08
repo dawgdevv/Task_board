@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -38,22 +39,6 @@ const HomePage = () => {
       icon: "🔒",
       color: "bg-indigo-500",
     },
-    {
-      id: 5,
-      title: "Real-time Updates",
-      description:
-        "Your changes are saved instantly and synced across all your devices.",
-      icon: "⚡",
-      color: "bg-yellow-500",
-    },
-    {
-      id: 6,
-      title: "Clean Interface",
-      description:
-        "Focus on what matters with our distraction-free, modern design.",
-      icon: "🎨",
-      color: "bg-pink-500",
-    },
   ];
 
   const stats = [
@@ -65,31 +50,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Navigation Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">📋</span>
-              <h1 className="text-2xl font-bold text-gray-900">TaskBoard</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate("/login")}
-                className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-md transition-colors"
-              >
-                Login
-              </button>
-              <button
-                onClick={() => navigate("/signup")}
-                className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors"
-              >
-                Sign Up
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -133,7 +94,7 @@ const HomePage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature) => (
             <div
               key={feature.id}
@@ -178,56 +139,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            How It Works
-          </h2>
-          <p className="text-lg text-gray-600">
-            Get started in three simple steps
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-indigo-600">1</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Create Account
-            </h3>
-            <p className="text-gray-600">
-              Sign up for free and access your personal dashboard
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-indigo-600">2</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Create Task Lists
-            </h3>
-            <p className="text-gray-600">
-              Organize your work by creating custom task lists
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-indigo-600">3</span>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Manage Tasks
-            </h3>
-            <p className="text-gray-600">
-              Add, edit, and track your tasks to boost productivity
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="bg-indigo-600 text-white py-16">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -244,21 +155,6 @@ const HomePage = () => {
           </button>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <span className="text-2xl">📋</span>
-              <span className="text-xl font-bold">TaskBoard</span>
-            </div>
-            <div className="text-gray-400">
-              © 2025 TaskBoard. Built with React & Node.js
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
