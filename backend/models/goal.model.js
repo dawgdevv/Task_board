@@ -41,4 +41,10 @@ const goalSchema = new mongoose.Schema(
   }
 );
 
+// Add compound indexes for better query performance
+goalSchema.index({ user: 1, createdAt: -1 });
+goalSchema.index({ user: 1, priority: 1 });
+goalSchema.index({ user: 1, targetDate: 1 });
+goalSchema.index({ user: 1, completed: 1 });
+
 export default mongoose.model("Goal", goalSchema);

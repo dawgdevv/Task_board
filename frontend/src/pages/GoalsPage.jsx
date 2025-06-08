@@ -139,6 +139,39 @@ const GoalsPage = () => {
     return diffDays;
   };
 
+  // Add this function to format description text
+  const formatDescription = (description) => {
+    if (!description) return null;
+
+    // Split by line breaks and filter out empty lines
+    const lines = description.split("\n").filter((line) => line.trim() !== "");
+
+    return lines.map((line, index) => {
+      const trimmedLine = line.trim();
+
+      // Check if it's a bullet point (starts with -, *, •, or number.)
+      const isBulletPoint =
+        /^[-*•]/.test(trimmedLine) || /^\d+\./.test(trimmedLine);
+
+      if (isBulletPoint) {
+        return (
+          <div key={index} className="flex items-start space-x-2 mb-1">
+            <span className="text-indigo-400 mt-1">•</span>
+            <span>
+              {trimmedLine.replace(/^[-*•]\s*/, "").replace(/^\d+\.\s*/, "")}
+            </span>
+          </div>
+        );
+      } else {
+        return (
+          <p key={index} className="mb-2">
+            {trimmedLine}
+          </p>
+        );
+      }
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -311,9 +344,15 @@ const GoalsPage = () => {
                       setFormData({ ...formData, description: e.target.value })
                     }
                     className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-700 text-white placeholder-gray-400"
-                    rows="3"
-                    placeholder="Describe your goal in detail..."
+                    rows="4"
+                    placeholder="Describe your goal in detail... 
+• Use bullet points for lists
+• Or write in paragraphs
+• Each line will be formatted automatically"
                   />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Tip: Start lines with -, *, • or numbers for bullet points
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -414,9 +453,9 @@ const GoalsPage = () => {
                 </div>
 
                 {goal.description && (
-                  <p className="text-gray-300 text-sm mb-4 line-clamp-3">
-                    {goal.description}
-                  </p>
+                  <div className="text-gray-300 text-sm mb-4 max-h-20 overflow-hidden">
+                    {formatDescription(goal.description)}
+                  </div>
                 )}
 
                 <div className="flex flex-wrap gap-2 mb-4">

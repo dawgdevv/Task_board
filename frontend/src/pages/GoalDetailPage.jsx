@@ -15,6 +15,39 @@ const GoalDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Add this function to format description text
+  const formatDescription = (description) => {
+    if (!description) return null;
+
+    // Split by line breaks and filter out empty lines
+    const lines = description.split("\n").filter((line) => line.trim() !== "");
+
+    return lines.map((line, index) => {
+      const trimmedLine = line.trim();
+
+      // Check if it's a bullet point (starts with -, *, •, or number.)
+      const isBulletPoint =
+        /^[-*•]/.test(trimmedLine) || /^\d+\./.test(trimmedLine);
+
+      if (isBulletPoint) {
+        return (
+          <div key={index} className="flex items-start space-x-2 mb-1">
+            <span className="text-indigo-400 mt-1 text-sm">•</span>
+            <span className="text-sm">
+              {trimmedLine.replace(/^[-*•]\s*/, "").replace(/^\d+\.\s*/, "")}
+            </span>
+          </div>
+        );
+      } else {
+        return (
+          <p key={index} className="mb-2 text-sm">
+            {trimmedLine}
+          </p>
+        );
+      }
+    });
+  };
+
   const fetchGoalData = useCallback(async () => {
     try {
       setLoading(true);
@@ -53,7 +86,7 @@ const GoalDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [goalId, navigate]);
+  }, [goalId, navigate, selectedListIndex]);
 
   useEffect(() => {
     fetchGoalData();
@@ -72,9 +105,9 @@ const GoalDetailPage = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             name: newListName,
-            goalId: goalId 
+            goalId: goalId,
           }),
         }
       );
@@ -97,22 +130,28 @@ const GoalDetailPage = () => {
 
   const handleListDelete = (deletedListId) => {
     // Adjust selected index if necessary
-    const deletedIndex = taskLists.findIndex(list => list._id === deletedListId);
+    const deletedIndex = taskLists.findIndex(
+      (list) => list._id === deletedListId
+    );
     if (deletedIndex === selectedListIndex) {
       setSelectedListIndex(taskLists.length > 1 ? 0 : -1);
     } else if (deletedIndex < selectedListIndex) {
       setSelectedListIndex(selectedListIndex - 1);
     }
-    
+
     fetchGoalData();
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case "high": return "text-red-400";
-      case "medium": return "text-yellow-400";
-      case "low": return "text-green-400";
-      default: return "text-gray-400";
+      case "high":
+        return "text-red-400";
+      case "medium":
+        return "text-yellow-400";
+      case "low":
+        return "text-green-400";
+      default:
+        return "text-gray-400";
     }
   };
 
@@ -193,9 +232,13 @@ const GoalDetailPage = () => {
         <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8 border border-gray-700">
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-white mb-2">{goal.title}</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                {goal.title}
+              </h2>
               {goal.description && (
-                <p className="text-gray-300 mb-3">{goal.description}</p>
+                <div className="text-gray-300 mb-3">
+                  {formatDescription(goal.description)}
+                </div>
               )}
               <div className="flex flex-wrap gap-3">
                 {goal.category && (
@@ -203,27 +246,50 @@ const GoalDetailPage = () => {
                     {goal.category}
                   </span>
                 )}
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(goal.priority)}`}>
-                  {goal.priority.charAt(0).toUpperCase() + goal.priority.slice(1)} Priority
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(
+                    goal.priority
+                  )}`}
+                >
+                  {goal.priority.charAt(0).toUpperCase() +
+                    goal.priority.slice(1)}{" "}
+                  Priority
                 </span>
               </div>
             </div>
-            <div className="text-right">
+            <div className="text-right ml-6">
               <div className="text-sm text-gray-400 mb-1">Target Date</div>
-              <div className="font-semibold text-white">{formatDate(goal.targetDate)}</div>
-              <div className={`text-sm mt-1 ${daysRemaining < 0 ? 'text-red-400' : daysRemaining < 30 ? 'text-orange-400' : 'text-green-400'}`}>
-                {daysRemaining < 0 ? `${Math.abs(daysRemaining)} days overdue` : 
-                 daysRemaining === 0 ? 'Due today' : 
-                 `${daysRemaining} days remaining`}
+              <div className="font-semibold text-white">
+                {formatDate(goal.targetDate)}
+              </div>
+              <div
+                className={`text-sm mt-1 ${
+                  daysRemaining < 0
+                    ? "text-red-400"
+                    : daysRemaining < 30
+                    ? "text-orange-400"
+                    : "text-green-400"
+                }`}
+              >
+                {daysRemaining < 0
+                  ? `${Math.abs(daysRemaining)} days overdue`
+                  : daysRemaining === 0
+                  ? "Due today"
+                  : `${daysRemaining} days remaining`}
               </div>
             </div>
           </div>
 
           {/* Progress Bar */}
           <div className="bg-gray-700 rounded-full h-2 mb-2">
-            <div 
+            <div
               className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${Math.min(100, Math.max(0, 100 - (daysRemaining / 365) * 100))}%` }}
+              style={{
+                width: `${Math.min(
+                  100,
+                  Math.max(0, 100 - (daysRemaining / 365) * 100)
+                )}%`,
+              }}
             ></div>
           </div>
           <div className="text-xs text-gray-400">
@@ -314,7 +380,8 @@ const GoalDetailPage = () => {
                 </svg>
               </div>
               <p className="text-gray-300 text-lg">
-                No action plans yet. Create your first action plan to break down "{goal.title}" into manageable tasks!
+                No action plans yet. Create your first action plan to break down
+                "{goal.title}" into manageable tasks!
               </p>
             </div>
           </div>

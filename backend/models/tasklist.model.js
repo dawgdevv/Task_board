@@ -23,4 +23,9 @@ const taskListSchema = new mongoose.Schema(
   }
 );
 
+// Add compound indexes
+taskListSchema.index({ user: 1, createdAt: -1 });
+taskListSchema.index({ goal: 1, user: 1 });
+taskListSchema.index({ user: 1, goal: 1 });
+
 export default mongoose.model("TaskList", taskListSchema);

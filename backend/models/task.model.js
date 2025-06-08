@@ -2,20 +2,9 @@ import mongoose from "mongoose";
 
 const taskSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    description: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-    completed: {
-      type: Boolean,
-      default: false,
-    },
+    title: { type: String, required: true },
+    description: { type: String },
+    completed: { type: Boolean, default: false },
     list: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "TaskList",
@@ -27,9 +16,12 @@ const taskSchema = new mongoose.Schema(
       required: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
+
+// Add compound indexes
+taskSchema.index({ user: 1, list: 1 });
+taskSchema.index({ list: 1, createdAt: -1 });
+taskSchema.index({ user: 1, completed: 1 });
 
 export default mongoose.model("Task", taskSchema);
