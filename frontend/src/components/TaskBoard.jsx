@@ -8,32 +8,9 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/tasks/list/${taskList._id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setTasks(data);
-        }
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
-
     fetchTasks();
-  }, [taskList._id]);
-
+  });
   const fetchTasks = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -85,6 +62,35 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
     }
   };
 
+  const handleTaskCompletion = async (taskId, completed) => {
+    try {
+      const token = localStorage.getItem("token");
+      const task = tasks.find((t) => t._id === taskId);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: task.title,
+            description: task.description,
+            completed: completed,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        fetchTasks();
+      }
+    } catch (error) {
+      console.error("Error updating task completion:", error);
+    }
+  };
+
   const handleDeleteList = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -112,7 +118,7 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
     }
   };
 
-  const handleTaskClick = (task) => {
+  const handleTaskEdit = (task) => {
     setSelectedTask(task);
     setShowTaskModal(true);
   };
@@ -123,31 +129,33 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center space-x-3">
-          <h3 className="text-lg font-semibold text-white">{taskList.name}</h3>
+    <div className="bg-gray-800 rounded-lg shadow-md p-4 border border-gray-700 space-y-4">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <h3 className="text-base font-semibold text-white">
+            {taskList.name}
+          </h3>
           {taskList.goal && (
-            <span className="text-sm text-gray-400 bg-gray-700 px-2 py-1 rounded-full">
-              Goal: {taskList.goal.title}
+            <span className="text-xs text-gray-400 bg-gray-700 px-2 py-0.5 rounded-full">
+              {taskList.goal.title}
             </span>
           )}
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1">
           <button
             onClick={() => setShowAddTask(true)}
-            className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-700"
+            className="bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center hover:bg-blue-700 text-sm"
             title="Add Task"
           >
             +
           </button>
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-700"
+            className="bg-red-600 text-white w-7 h-7 rounded-full flex items-center justify-center hover:bg-red-700"
             title="Delete List"
           >
             <svg
-              className="w-4 h-4"
+              className="w-3 h-3"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -164,19 +172,19 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
       </div>
 
       {showAddTask && (
-        <div className="mb-4">
+        <div className="bg-gray-750 rounded-md p-3 border border-gray-600">
           <div className="flex space-x-2">
             <input
               type="text"
               placeholder="Enter task title"
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-700 text-white"
+              className="flex-1 px-2 py-1 border border-gray-600 rounded text-sm bg-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
               onKeyPress={(e) => e.key === "Enter" && handleAddTask()}
             />
             <button
               onClick={handleAddTask}
-              className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 text-sm"
+              className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
             >
               Add
             </button>
@@ -185,7 +193,7 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
                 setShowAddTask(false);
                 setNewTaskTitle("");
               }}
-              className="bg-gray-600 text-white px-3 py-2 rounded-md hover:bg-gray-700 text-sm"
+              className="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700"
             >
               Cancel
             </button>
@@ -197,39 +205,61 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
         {tasks.map((task) => (
           <div
             key={task._id}
-            onClick={() => handleTaskClick(task)}
-            className={`p-3 border rounded-md cursor-pointer hover:bg-gray-700 ${
+            className={`p-3 border rounded-md transition-colors ${
               task.completed
-                ? "bg-green-900 border-green-700"
-                : "border-gray-600 bg-gray-750"
+                ? "bg-green-900/20 border-green-700/50"
+                : "border-gray-600 bg-gray-750/50 hover:bg-gray-700/50"
             }`}
           >
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <input
                 type="checkbox"
                 checked={task.completed}
-                readOnly
-                className="w-4 h-4 text-blue-600"
+                onChange={(e) =>
+                  handleTaskCompletion(task._id, e.target.checked)
+                }
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
               />
-              <span
-                className={`flex-1 ${
-                  task.completed ? "line-through text-gray-400" : "text-white"
-                }`}
+              <div className="flex-1 min-w-0">
+                <span
+                  className={`block text-sm ${
+                    task.completed ? "line-through text-gray-400" : "text-white"
+                  }`}
+                >
+                  {task.title}
+                </span>
+                {task.description && (
+                  <p className="text-xs text-gray-400 mt-1 truncate">
+                    {task.description}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => handleTaskEdit(task)}
+                className="text-gray-400 hover:text-blue-400 p-1"
+                title="Edit Task"
               >
-                {task.title}
-              </span>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </button>
             </div>
-            {task.description && (
-              <p className="text-sm text-gray-400 mt-1 truncate">
-                {task.description}
-              </p>
-            )}
           </div>
         ))}
       </div>
 
       {tasks.length === 0 && (
-        <p className="text-gray-400 text-center py-4">
+        <p className="text-gray-400 text-center py-4 text-sm">
           No tasks yet. Add your first task!
         </p>
       )}
@@ -237,11 +267,11 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full border border-gray-600">
-            <div className="flex items-center mb-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-900 flex items-center justify-center">
+          <div className="bg-gray-800 rounded-lg p-4 max-w-sm w-full border border-gray-600">
+            <div className="flex items-center mb-3">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-red-900 flex items-center justify-center">
                 <svg
-                  className="w-6 h-6 text-red-400"
+                  className="w-4 h-4 text-red-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -254,32 +284,29 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
                   />
                 </svg>
               </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-white">
+              <div className="ml-3">
+                <h3 className="text-base font-medium text-white">
                   Delete Task List
                 </h3>
-                <p className="text-sm text-gray-400">
-                  Are you sure you want to delete "{taskList.name}"?
-                </p>
+                <p className="text-xs text-gray-400">"{taskList.name}"</p>
               </div>
             </div>
-            <div className="bg-red-900 border border-red-700 rounded-md p-3 mb-4">
-              <p className="text-sm text-red-300">
-                <strong>Warning:</strong> This will permanently delete the list
-                and all {tasks.length} task(s) in it. This action cannot be
-                undone.
+            <div className="bg-red-900 border border-red-700 rounded p-2 mb-3">
+              <p className="text-xs text-red-300">
+                This will permanently delete the list and all {tasks.length}{" "}
+                task(s). Cannot be undone.
               </p>
             </div>
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end space-x-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600"
+                className="px-3 py-1 text-xs font-medium text-gray-300 bg-gray-700 border border-gray-600 rounded hover:bg-gray-600"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteList}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
+                className="px-3 py-1 text-xs font-medium text-white bg-red-600 border border-transparent rounded hover:bg-red-700"
               >
                 Delete List
               </button>
