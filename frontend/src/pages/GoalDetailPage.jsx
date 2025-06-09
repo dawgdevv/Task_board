@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import TaskBoard from "../components/TaskBoard";
-import Taskslider from "../components/Taskslider";
 import ProfileIcon from "../components/ProfileIcon";
+import EditGoalModal from "../components/EditGoalModal";
 
 const GoalDetailPage = () => {
   const { goalId } = useParams();
@@ -14,18 +14,33 @@ const GoalDetailPage = () => {
   const [newListName, setNewListName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showTaskListModal, setShowTaskListModal] = useState(false);
+  const [selectedTaskListForModal, setSelectedTaskListForModal] =
+    useState(null);
+  const [showEditGoal, setShowEditGoal] = useState(false);
+  const scrollerRef = useRef(null);
 
-  // Add this function to format description text
+  const handleWheel = (e) => {
+    if (scrollerRef.current) {
+      // Only scroll horizontally if there's a horizontal scrollbar
+      if (
+        e.deltaY !== 0 &&
+        scrollerRef.current.scrollWidth > scrollerRef.current.clientWidth
+      ) {
+        e.preventDefault();
+        scrollerRef.current.scrollLeft += e.deltaY;
+      }
+    }
+  };
+
+  // Format description function
   const formatDescription = (description) => {
     if (!description) return null;
 
-    // Split by line breaks and filter out empty lines
     const lines = description.split("\n").filter((line) => line.trim() !== "");
 
     return lines.map((line, index) => {
       const trimmedLine = line.trim();
-
-      // Check if it's a bullet point (starts with -, *, •, or number.)
       const isBulletPoint =
         /^[-*•]/.test(trimmedLine) || /^\d+\./.test(trimmedLine);
 
@@ -116,7 +131,7 @@ const GoalDetailPage = () => {
         await fetchGoalData();
         setNewListName("");
         setShowCreateList(false);
-        setSelectedListIndex(taskLists.length); // Select the new list
+        setSelectedListIndex(taskLists.length);
       }
     } catch (error) {
       console.error("Error creating task list:", error);
@@ -128,30 +143,67 @@ const GoalDetailPage = () => {
     setSelectedListIndex(index);
   };
 
-  const handleListDelete = (deletedListId) => {
-    // Adjust selected index if necessary
-    const deletedIndex = taskLists.findIndex(
-      (list) => list._id === deletedListId
-    );
-    if (deletedIndex === selectedListIndex) {
-      setSelectedListIndex(taskLists.length > 1 ? 0 : -1);
-    } else if (deletedIndex < selectedListIndex) {
-      setSelectedListIndex(selectedListIndex - 1);
-    }
+  const handleOpenTaskListModal = (taskList) => {
+    setSelectedTaskListForModal(taskList);
+    setShowTaskListModal(true);
+  };
 
-    fetchGoalData();
+  const handleCloseTaskListModal = () => {
+    setShowTaskListModal(false);
+    setSelectedTaskListForModal(null);
+  };
+
+  const handleListDelete = async (deletedListId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/tasks/lists/${deletedListId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Update selectedListIndex after deletion
+        const deletedIndex = taskLists.findIndex(
+          (list) => list._id === deletedListId
+        );
+
+        if (deletedIndex === selectedListIndex) {
+          setSelectedListIndex(taskLists.length > 1 ? 0 : -1);
+        } else if (deletedIndex < selectedListIndex) {
+          setSelectedListIndex(selectedListIndex - 1);
+        }
+
+        // Close modal if the deleted list was open in modal
+        if (
+          selectedTaskListForModal &&
+          selectedTaskListForModal._id === deletedListId
+        ) {
+          handleCloseTaskListModal();
+        }
+
+        fetchGoalData();
+      }
+    } catch (error) {
+      console.error("Error deleting task list:", error);
+      setError("Failed to delete task list");
+    }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "high":
-        return "text-red-400";
+        return "bg-red-900 text-red-300";
       case "medium":
-        return "text-yellow-400";
+        return "bg-yellow-900 text-yellow-300";
       case "low":
-        return "text-green-400";
+        return "bg-green-900 text-green-300";
       default:
-        return "text-gray-400";
+        return "bg-gray-700 text-gray-300";
     }
   };
 
@@ -217,10 +269,10 @@ const GoalDetailPage = () => {
             <div className="flex items-center space-x-4">
               <ProfileIcon />
               <button
-                onClick={() => navigate("/dashboard")}
+                onClick={() => navigate("/goals")}
                 className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
               >
-                Dashboard
+                Goals Dashboard
               </button>
             </div>
           </div>
@@ -257,25 +309,33 @@ const GoalDetailPage = () => {
                 </span>
               </div>
             </div>
-            <div className="text-right ml-6">
-              <div className="text-sm text-gray-400 mb-1">Target Date</div>
-              <div className="font-semibold text-white">
-                {formatDate(goal.targetDate)}
-              </div>
-              <div
-                className={`text-sm mt-1 ${
-                  daysRemaining < 0
-                    ? "text-red-400"
-                    : daysRemaining < 30
-                    ? "text-orange-400"
-                    : "text-green-400"
-                }`}
+            <div className="text-right ml-6 flex flex-col items-end gap-2">
+              <button
+                onClick={() => setShowEditGoal(true)}
+                className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors mb-2"
               >
-                {daysRemaining < 0
-                  ? `${Math.abs(daysRemaining)} days overdue`
-                  : daysRemaining === 0
-                  ? "Due today"
-                  : `${daysRemaining} days remaining`}
+                Edit Goal
+              </button>
+              <div>
+                <div className="text-sm text-gray-400 mb-1">Target Date</div>
+                <div className="font-semibold text-white">
+                  {formatDate(goal.targetDate)}
+                </div>
+                <div
+                  className={`text-sm mt-1 ${
+                    daysRemaining < 0
+                      ? "text-red-400"
+                      : daysRemaining < 30
+                      ? "text-orange-400"
+                      : "text-green-400"
+                  }`}
+                >
+                  {daysRemaining < 0
+                    ? `${Math.abs(daysRemaining)} days overdue`
+                    : daysRemaining === 0
+                    ? "Due today"
+                    : `${daysRemaining} days remaining`}
+                </div>
               </div>
             </div>
           </div>
@@ -297,9 +357,9 @@ const GoalDetailPage = () => {
           </div>
         </div>
 
-        {/* Task Lists Section */}
+        {/* Action Plans Section */}
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-white">
               Action Plans for "{goal.title}"
             </h2>
@@ -341,32 +401,82 @@ const GoalDetailPage = () => {
               </div>
             </div>
           )}
-        </div>
 
-        {/* Task List Slider */}
-        <Taskslider
-          taskLists={taskLists}
-          selectedListIndex={selectedListIndex}
-          onListSelect={handleListSelect}
-          onListDelete={handleListDelete}
-        />
+          {/* Horizontal Task List Scroller */}
+          {taskLists.length > 0 ? (
+            <div className="mb-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <h3 className="text-lg font-medium text-white">
+                  Select Action Plan:
+                </h3>
+                <span className="text-sm text-gray-400">
+                  ({taskLists.length} action plan
+                  {taskLists.length !== 1 ? "s" : ""})
+                </span>
+              </div>
 
-        {/* Selected Task Board Display */}
-        {taskLists.length > 0 && selectedListIndex >= 0 ? (
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-            <TaskBoard
-              key={taskLists[selectedListIndex]?._id}
-              taskList={taskLists[selectedListIndex]}
-              onUpdate={fetchGoalData}
-              onDelete={handleListDelete}
-            />
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <div className="bg-gray-800 rounded-lg shadow-md p-8 border border-gray-700">
+              <div className="relative">
+                <div
+                  ref={scrollerRef}
+                  onWheel={handleWheel}
+                  style={{ scrollBehavior: "smooth" }}
+                  className="flex space-x-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600 hover:scrollbar-thumb-gray-500"
+                >
+                  {taskLists.map((list, index) => (
+                    <div
+                      key={list._id}
+                      className={`flex-shrink-0 w-72 p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer ${
+                        selectedListIndex === index
+                          ? "border-indigo-500 bg-indigo-900/20 shadow-lg"
+                          : "border-gray-700 bg-gray-800 hover:border-gray-600 hover:bg-gray-750"
+                      }`}
+                      onClick={() => handleListSelect(index)}
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="text-lg font-semibold text-white truncate pr-2">
+                          {list.name}
+                        </h4>
+                      </div>
+
+                      <p className="text-gray-400 text-sm mb-3">
+                        Created: {new Date(list.createdAt).toLocaleDateString()}
+                      </p>
+
+                      <div className="flex justify-between items-center">
+                        <div className="text-sm">
+                          {selectedListIndex === index && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-indigo-600 text-white">
+                              <svg
+                                className="w-3 h-3 mr-1"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              Selected
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Scroll horizontally to view all action plans. Click to select
+                and view tasks below.
+              </p>
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-gray-800 rounded-lg border border-gray-700">
               <div className="text-gray-500 mb-4">
                 <svg
-                  className="w-16 h-16 mx-auto"
+                  className="w-12 h-12 mx-auto"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -384,9 +494,134 @@ const GoalDetailPage = () => {
                 "{goal.title}" into manageable tasks!
               </p>
             </div>
+          )}
+        </div>
+
+        {/* Task Management Section - NEW FEATURE */}
+        {selectedListIndex >= 0 && taskLists[selectedListIndex] && (
+          <div className="mb-8">
+            <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+              <div className="bg-gray-750 px-6 py-4 border-b border-gray-700 rounded-t-lg">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <h3 className="text-xl font-bold text-white">
+                      📋 {taskLists[selectedListIndex].name}
+                    </h3>
+                    <span className="bg-indigo-800 text-indigo-200 px-3 py-1 rounded-full text-sm">
+                      Tasks & Progress
+                    </span>
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleOpenTaskListModal(taskLists[selectedListIndex])
+                    }
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center text-sm"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                    Open Full View
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <TaskBoard
+                  key={taskLists[selectedListIndex]._id}
+                  taskList={taskLists[selectedListIndex]}
+                  onUpdate={fetchGoalData}
+                  onDelete={handleListDelete}
+                />
+              </div>
+            </div>
           </div>
         )}
       </main>
+
+      {/* Task List Modal */}
+      {showTaskListModal && selectedTaskListForModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-900 rounded-lg shadow-2xl border border-gray-600 w-full max-w-6xl max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gray-800 px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+              <div className="flex items-center space-x-3">
+                <h3 className="text-xl font-bold text-white">
+                  {selectedTaskListForModal.name}
+                </h3>
+                <span className="bg-blue-800 text-blue-200 px-2 py-1 rounded-full text-xs">
+                  Part of: {goal.title}
+                </span>
+              </div>
+              <button
+                onClick={handleCloseTaskListModal}
+                className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-700 transition-colors"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <TaskBoard
+                key={selectedTaskListForModal._id}
+                taskList={selectedTaskListForModal}
+                onUpdate={() => {
+                  fetchGoalData();
+                  // Keep modal open after updates
+                }}
+                onDelete={(deletedListId) => {
+                  handleListDelete(deletedListId);
+                  // Modal will be closed by handleListDelete if this list was deleted
+                }}
+              />
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-gray-800 px-6 py-3 border-t border-gray-700 flex justify-end">
+              <button
+                onClick={handleCloseTaskListModal}
+                className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Goal Modal */}
+      {showEditGoal && (
+        <EditGoalModal
+          goal={goal}
+          onClose={() => setShowEditGoal(false)}
+          onUpdated={async () => {
+            await fetchGoalData();
+            setShowEditGoal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

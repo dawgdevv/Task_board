@@ -135,6 +135,7 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
           <h3 className="text-base font-semibold text-white">
             {taskList.name}
           </h3>
+          <h4>{taskList.description}</h4>
           {taskList.goal && (
             <span className="text-xs text-gray-400 bg-gray-700 px-2 py-0.5 rounded-full">
               {taskList.goal.title}
