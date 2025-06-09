@@ -14,8 +14,8 @@ const Navbar = ({ user, onLogout }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl">📋</span>
-              <h1 className="text-2xl font-bold text-gray-900">TaskBoard</h1>
+              <span className="text-2xl">🎯</span>
+              <h1 className="text-2xl font-bold text-gray-900">GoalFlow</h1>
             </div>
             <div className="flex items-center space-x-4">
               <button
@@ -60,8 +60,8 @@ const Navbar = ({ user, onLogout }) => {
           Back to Home
         </button>
         <div className="flex items-center justify-center space-x-2 mb-4">
-          <span className="text-2xl">📋</span>
-          <h1 className="text-2xl font-bold text-gray-900">TaskBoard</h1>
+          <span className="text-2xl">🎯</span>
+          <h1 className="text-2xl font-bold text-gray-900">GoalFlow</h1>
         </div>
       </div>
     );
@@ -74,8 +74,8 @@ const Navbar = ({ user, onLogout }) => {
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl">📋</span>
-              <h1 className="text-2xl font-bold text-white">TaskBoard</h1>
+              <span className="text-2xl">🎯</span>
+              <h1 className="text-2xl font-bold text-white">GoalFlow</h1>
             </div>
             {location.pathname !== "/goals" && (
               <button
