@@ -5,8 +5,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# Accept build argument for API URL
-ARG VITE_API_URL=http://goalflow-backend:5000
+# Accept build argument for API URL (for browser access)
+ARG VITE_API_URL=http://localhost:5000
 ENV VITE_API_URL=${VITE_API_URL}
 
 COPY . .
