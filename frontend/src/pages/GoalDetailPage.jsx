@@ -1,8 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import TaskBoard from "../components/TaskBoard";
 import ProfileIcon from "../components/ProfileIcon";
 import EditGoalModal from "../components/EditGoalModal";
+import TimeTracker from "../components/TimeTracker";
+import DailyTimeStats from "../components/DailyTimeStats";
 
 const GoalDetailPage = () => {
   const { goalId } = useParams();
@@ -18,6 +21,7 @@ const GoalDetailPage = () => {
   const [selectedTaskListForModal, setSelectedTaskListForModal] =
     useState(null);
   const [showEditGoal, setShowEditGoal] = useState(false);
+  const [showTimeTracker, setShowTimeTracker] = useState(false); // Add this missing state
   const scrollerRef = useRef(null);
 
   const handleWheel = (e) => {
@@ -207,7 +211,7 @@ const GoalDetailPage = () => {
     }
   };
 
-  const formatDate = (dateString) => {
+  const _formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString();
   };
 
@@ -217,6 +221,12 @@ const GoalDetailPage = () => {
     const diffTime = target - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
+  };
+
+  const handleTimeLogged = (timeLog) => {
+    // Refresh goal data to update any time-related displays
+    fetchGoalData();
+    console.log("Time logged successfully:", timeLog);
   };
 
   if (loading) {
@@ -253,34 +263,10 @@ const GoalDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Header */}
-      <header className="bg-gray-800 shadow-sm border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate("/goals")}
-                className="text-indigo-400 hover:text-indigo-300"
-              >
-                ← Back to Goals
-              </button>
-              <h1 className="text-2xl font-bold text-white">Goal Progress</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <ProfileIcon />
-              <button
-                onClick={() => navigate("/goals")}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-              >
-                Goals Dashboard
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Goal Information Card */}
+        {/* Goal Information Card with Time Stats */}
         <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8 border border-gray-700">
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1">
@@ -309,33 +295,53 @@ const GoalDetailPage = () => {
                 </span>
               </div>
             </div>
-            <div className="text-right ml-6 flex flex-col items-end gap-2">
-              <button
-                onClick={() => setShowEditGoal(true)}
-                className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors mb-2"
-              >
-                Edit Goal
-              </button>
-              <div>
-                <div className="text-sm text-gray-400 mb-1">Target Date</div>
-                <div className="font-semibold text-white">
-                  {formatDate(goal.targetDate)}
-                </div>
-                <div
-                  className={`text-sm mt-1 ${
-                    daysRemaining < 0
-                      ? "text-red-400"
-                      : daysRemaining < 30
-                      ? "text-orange-400"
-                      : "text-green-400"
-                  }`}
+
+            {/* Right side with Time Stats and Action Buttons */}
+            <div className="ml-6 flex gap-4">
+              {/* Compact Time Stats */}
+              <DailyTimeStats goalId={goalId} goalTitle={goal?.title} />
+
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => setShowEditGoal(true)}
+                  className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 flex items-center whitespace-nowrap"
                 >
-                  {daysRemaining < 0
-                    ? `${Math.abs(daysRemaining)} days overdue`
-                    : daysRemaining === 0
-                    ? "Due today"
-                    : `${daysRemaining} days remaining`}
-                </div>
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  Edit Goal
+                </button>
+
+                <button
+                  onClick={() => setShowTimeTracker(true)}
+                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center whitespace-nowrap"
+                >
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Track Time
+                </button>
               </div>
             </div>
           </div>
@@ -497,7 +503,7 @@ const GoalDetailPage = () => {
           )}
         </div>
 
-        {/* Task Management Section - NEW FEATURE */}
+        {/* Task Management Section */}
         {selectedListIndex >= 0 && taskLists[selectedListIndex] && (
           <div className="mb-8">
             <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
@@ -622,6 +628,17 @@ const GoalDetailPage = () => {
           }}
         />
       )}
+
+      {/* Time Tracker Modal */}
+      <TimeTracker
+        goalId={goalId}
+        taskListId={
+          selectedListIndex >= 0 ? taskLists[selectedListIndex]?._id : null
+        }
+        onTimeLogged={handleTimeLogged}
+        onClose={() => setShowTimeTracker(false)}
+        isOpen={showTimeTracker}
+      />
     </div>
   );
 };

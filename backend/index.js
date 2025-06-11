@@ -5,7 +5,7 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/user.routes.js";
 import taskRoutes from "./routes/task.routes.js";
 import goalRoutes from "./routes/goal.routes.js";
-
+import timeLogRoutes from "./routes/timelog.routes.js";
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/goals", goalRoutes);
+app.use("/api/timelogs", timeLogRoutes);
 
 app.get("/", (req, res) => {
   res.send("Task Board API is running!");
