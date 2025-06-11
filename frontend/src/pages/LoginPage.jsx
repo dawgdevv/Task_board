@@ -45,7 +45,6 @@ const LoginPage = () => {
         setError(data.message || "Login failed");
       }
     } catch (error) {
-      console.error("Login error:", error);
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
