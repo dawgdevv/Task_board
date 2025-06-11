@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   backend:
+    image: dawgdevv/goalflow-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -19,6 +20,7 @@ services:
       - goalflow_network
 
   frontend:
+    image: dawgdevv/goalflow-frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
