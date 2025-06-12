@@ -17,6 +17,7 @@ const GoalDetailPage = () => {
   const [newListName, setNewListName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [user, setUser] = useState(null);
   const [showTaskListModal, setShowTaskListModal] = useState(false);
   const [selectedTaskListForModal, setSelectedTaskListForModal] =
     useState(null);
@@ -110,7 +111,24 @@ const GoalDetailPage = () => {
   useEffect(() => {
     fetchGoalData();
   }, [fetchGoalData]);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    try {
+      const parsedUser = JSON.parse(localStorage.getItem("user"));
 
+      setUser(parsedUser);
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      setError("Failed to load user data");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login");
+    }
+  }, [navigate]);
   const handleCreateList = async () => {
     if (!newListName.trim()) return;
 
@@ -141,6 +159,11 @@ const GoalDetailPage = () => {
       console.error("Error creating task list:", error);
       setError("Failed to create task list");
     }
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
   };
 
   const handleListSelect = (index) => {
@@ -263,7 +286,7 @@ const GoalDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <Navbar />
+      <Navbar user={user} onLogout={handleLogout} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Goal Information Card with Time Stats */}
@@ -345,22 +368,11 @@ const GoalDetailPage = () => {
               </div>
             </div>
           </div>
-
-          {/* Progress Bar */}
-          <div className="bg-gray-700 rounded-full h-2 mb-2">
-            <div
-              className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
-              style={{
-                width: `${Math.min(
-                  100,
-                  Math.max(0, 100 - (daysRemaining / 365) * 100)
-                )}%`,
-              }}
-            ></div>
-          </div>
-          <div className="text-xs text-gray-400">
-            Progress towards your goal
-          </div>
+          <span className="bg-green-400 rounded-xl text-sm px-3 py-1 text-gray-900 font-semibold">
+            {daysRemaining >= 0
+              ? `Days Remaining: ${daysRemaining}`
+              : `Target Date Passed: ${Math.abs(daysRemaining)} days ago`}
+          </span>
         </div>
 
         {/* Action Plans Section */}
