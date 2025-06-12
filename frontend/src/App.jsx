@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import GoalsPage from "./pages/GoalsPage";
 import GoalDetailPage from "./pages/GoalDetailPage";
+import TimeLogsPage from "./pages/TimeLogsPage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/goal/:goalId" element={<GoalDetailPage />} />
           {/* Redirect dashboard to goals as the new entry point */}
           <Route path="/dashboard" element={<Navigate to="/goals" replace />} />
+          <Route path="/timelogs" element={<TimeLogsPage />} />
         </Routes>
       </div>
     </Router>

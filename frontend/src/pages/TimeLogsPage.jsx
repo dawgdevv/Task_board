@@ -17,52 +17,8 @@ const TimeLogsPage = () => {
   const [stats, setStats] = useState(null);
   const navigate = useNavigate();
 
-  const fetchTimeLogs = useCallback(async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-      const queryParams = new URLSearchParams();
-
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value);
-      });
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/timelogs?${queryParams}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setTimeLogs(data.timeLogs);
-      } else {
-        setError("Failed to fetch time logs");
-      }
-    } catch (error) {
-      console.error("Error fetching time logs:", error);
-      setError("Failed to fetch time logs");
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]);
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userData = localStorage.getItem("user");
-
-    if (!token || !userData) {
-      navigate("/login");
-      return;
-    }
-
-    setUser(JSON.parse(userData));
-    fetchTimeLogs();
-    fetchGoals();
-    fetchStats();
-  }, [navigate, filters, fetchTimeLogs]);
-
-  const fetchGoals = async () => {
+  // Fetch Goals function
+  const fetchGoals = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -79,9 +35,10 @@ const TimeLogsPage = () => {
     } catch (error) {
       console.error("Error fetching goals:", error);
     }
-  };
+  }, []);
 
-  const fetchStats = async () => {
+  // Fetch Stats function
+  const fetchStats = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -98,7 +55,64 @@ const TimeLogsPage = () => {
     } catch (error) {
       console.error("Error fetching stats:", error);
     }
-  };
+  }, []);
+
+  // Fetch Time Logs function
+  const fetchTimeLogs = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const token = localStorage.getItem("token");
+      const queryParams = new URLSearchParams();
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) queryParams.append(key, value);
+      });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/timelogs?${queryParams}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setTimeLogs(data.timeLogs || []);
+      } else {
+        throw new Error("Failed to fetch time logs");
+      }
+    } catch (error) {
+      console.error("Error fetching time logs:", error);
+      setError("Failed to fetch time logs");
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
+  // Main useEffect for initialization
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+
+    if (!token || !userData) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setUser(JSON.parse(userData));
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      navigate("/login");
+      return;
+    }
+
+    // Fetch all data
+    fetchTimeLogs();
+    fetchGoals();
+    fetchStats();
+  }, [navigate, fetchTimeLogs, fetchGoals, fetchStats]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -107,6 +121,7 @@ const TimeLogsPage = () => {
   };
 
   const formatDuration = (minutes) => {
+    if (!minutes || minutes === 0) return "0m";
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
@@ -126,8 +141,14 @@ const TimeLogsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading time logs...</div>
+      <div className="min-h-screen bg-gray-900">
+        <Navbar user={user} onLogout={handleLogout} />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-400 mx-auto mb-4"></div>
+            <p className="text-gray-300">Loading time logs...</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -174,7 +195,7 @@ const TimeLogsPage = () => {
                   <div>
                     <span className="text-gray-400">Avg Session:</span>
                     <span className="text-white font-semibold ml-2">
-                      {formatDuration(Math.round(stat.avgSessionLength))}
+                      {formatDuration(Math.round(stat.avgSessionLength || 0))}
                     </span>
                   </div>
                 </div>
@@ -200,7 +221,7 @@ const TimeLogsPage = () => {
                     page: 1,
                   }))
                 }
-                className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white"
+                className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="">All Goals</option>
                 {goals.map((goal) => (
@@ -225,7 +246,7 @@ const TimeLogsPage = () => {
                     page: 1,
                   }))
                 }
-                className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white"
+                className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
 
@@ -243,7 +264,7 @@ const TimeLogsPage = () => {
                     page: 1,
                   }))
                 }
-                className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white"
+                className="w-full px-3 py-2 border border-gray-600 rounded bg-gray-700 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
 
@@ -257,7 +278,7 @@ const TimeLogsPage = () => {
                     page: 1,
                   })
                 }
-                className="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
+                className="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
               >
                 Clear Filters
               </button>
@@ -265,29 +286,33 @@ const TimeLogsPage = () => {
           </div>
         </div>
 
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
         {/* Time Logs List */}
         <div className="bg-gray-800 rounded-lg border border-gray-700">
           <div className="px-6 py-4 border-b border-gray-700">
             <h3 className="text-lg font-semibold text-white">
-              Recent Time Logs
+              Recent Time Logs ({timeLogs.length})
             </h3>
           </div>
-
-          {error && (
-            <div className="p-6 bg-red-900 border-b border-gray-700 text-red-200">
-              {error}
-            </div>
-          )}
 
           <div className="divide-y divide-gray-700">
             {timeLogs.length > 0 ? (
               timeLogs.map((log) => (
-                <div key={log._id} className="p-6 hover:bg-gray-750">
+                <div
+                  key={log._id}
+                  className="p-6 hover:bg-gray-750 transition-colors"
+                >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h4 className="text-white font-medium">
-                          {log.goal?.title}
+                          {log.goal?.title || "Unknown Goal"}
                         </h4>
                         <span
                           className={`px-2 py-1 rounded-full text-xs text-white ${getCategoryColor(
@@ -323,19 +348,42 @@ const TimeLogsPage = () => {
 
                       <div className="flex items-center gap-4 text-xs text-gray-400">
                         <span>
-                          {new Date(log.createdAt).toLocaleDateString()} at{" "}
-                          {new Date(log.createdAt).toLocaleTimeString()}
+                          {new Date(log.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}{" "}
+                          at{" "}
+                          {new Date(log.createdAt).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </span>
-                        <span>
-                          {new Date(log.startTime).toLocaleTimeString()} -{" "}
-                          {new Date(log.endTime).toLocaleTimeString()}
-                        </span>
+                        {log.startTime && log.endTime && (
+                          <span>
+                            {new Date(log.startTime).toLocaleTimeString(
+                              "en-US",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}{" "}
+                            -{" "}
+                            {new Date(log.endTime).toLocaleTimeString("en-US", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    <div className="text-right">
+                    <div className="text-right ml-4">
                       <div className="text-lg font-semibold text-white">
                         {formatDuration(log.duration)}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {(log.duration / 60).toFixed(1)}h
                       </div>
                     </div>
                   </div>
@@ -361,9 +409,15 @@ const TimeLogsPage = () => {
                 <h3 className="text-gray-400 text-lg font-medium mb-2">
                   No Time Logs Found
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-gray-500 mb-4">
                   Start tracking time on your goals to see logs here.
                 </p>
+                <button
+                  onClick={() => navigate("/goals")}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+                >
+                  Go to Goals
+                </button>
               </div>
             )}
           </div>
