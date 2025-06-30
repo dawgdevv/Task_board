@@ -29,9 +29,9 @@
     --ctp-surface1: #45475a;
     --ctp-surface0: #313244;
 
-    --ctp-base: #1e1e2e;   /* Main background */
+    --ctp-base: #1e1e2e; /* Main background */
     --ctp-mantle: #181825; /* Secondary background (e.g., cards, sidebars) */
-    --ctp-crust: #11111b;  /* Tertiary background (e.g., header/footer bars) */
+    --ctp-crust: #11111b; /* Tertiary background (e.g., header/footer bars) */
 
     /* Semantic colors for buttons (examples) */
     --button-primary-bg: var(--ctp-peach);
@@ -43,37 +43,99 @@
   }
 
   body {
-    @apply bg-[var(--ctp-base)] text-[var(--ctp-text)];
-    font-family: 'Inter', sans-serif; /* Example font, adjust if project has a specific one */
+    background-color: var(--ctp-base);
+    color: var(--ctp-text);
+    font-family: "Inter", sans-serif; /* Example font, adjust if project has a specific one */
   }
 
   /* General styles for better dark mode appearance */
   .card {
-    @apply bg-[var(--ctp-mantle)] p-4 rounded-lg shadow-md;
+    background-color: var(--ctp-mantle);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 
   .input-field {
-    @apply bg-[var(--ctp-surface0)] text-[var(--ctp-text)] border border-[var(--ctp-surface1)] rounded-md p-2 focus:ring-[var(--ctp-peach)] focus:border-[var(--ctp-peach)];
+    background-color: var(--ctp-surface0);
+    color: var(--ctp-text);
+    border: 1px solid var(--ctp-surface1);
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    transition: all 0.15s ease-in-out;
   }
 
-  .button-base {
-    @apply px-4 py-2 rounded-md font-semibold focus:outline-none transition-colors duration-150;
+  .input-field:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(250, 179, 135, 0.3);
+    border-color: var(--ctp-peach);
   }
 
   .button-primary {
-    @apply button-base bg-[var(--button-primary-bg)] text-[var(--button-primary-text)] hover:bg-opacity-80;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  .button-primary:focus {
+    outline: none;
+  }
+
+  .button-primary:hover {
+    opacity: 0.8;
   }
 
   .button-secondary {
-    @apply button-base bg-[var(--button-secondary-bg)] text-[var(--button-secondary-text)] hover:bg-[var(--ctp-surface1)];
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+  }
+
+  .button-secondary:focus {
+    outline: none;
+  }
+
+  .button-secondary:hover {
+    background-color: var(--ctp-surface1);
   }
 
   .button-danger {
-    @apply button-base bg-[var(--button-danger-bg)] text-[var(--button-danger-text)] hover:bg-opacity-80;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    background-color: var(--button-danger-bg);
+    color: var(--button-danger-text);
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  .button-danger:focus {
+    outline: none;
+  }
+
+  .button-danger:hover {
+    opacity: 0.8;
   }
 
   /* Example: Style links to be more visible in dark mode */
   a {
-    @apply text-[var(--ctp-sky)] hover:text-[var(--ctp-teal)];
+    color: var(--ctp-sky);
+    transition: color 0.15s ease-in-out;
+  }
+
+  a:hover {
+    color: var(--ctp-teal);
   }
 }
