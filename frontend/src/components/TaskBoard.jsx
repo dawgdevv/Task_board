@@ -40,7 +40,8 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
   }, [taskList._id]); // Dependency: taskList._id
 
   useEffect(() => {
-    if (taskList?._id) { // Ensure taskList and its _id are available
+    if (taskList?._id) {
+      // Ensure taskList and its _id are available
       fetchTasks();
     } else {
       setTasks([]); // Clear tasks if no valid taskList
@@ -57,7 +58,10 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
         `${import.meta.env.VITE_API_URL}/api/tasks`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ title: newTaskTitle, listId: taskList._id }),
         }
       );
@@ -77,27 +81,37 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
     }
   }, [newTaskTitle, taskList._id, fetchTasks]);
 
-  const handleTaskCompletion = useCallback(async (taskId, completed) => {
-    try {
-      const token = localStorage.getItem("token");
-      const task = tasks.find((t) => t._id === taskId);
-      if (!task) return;
+  const handleTaskCompletion = useCallback(
+    async (taskId, completed) => {
+      try {
+        const token = localStorage.getItem("token");
+        const task = tasks.find((t) => t._id === taskId);
+        if (!task) return;
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ title: task.title, description: task.description, completed: completed }),
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              title: task.title,
+              description: task.description,
+              completed: completed,
+            }),
+          }
+        );
+        if (response.ok) {
+          fetchTasks();
         }
-      );
-      if (response.ok) {
-        fetchTasks();
+      } catch (error) {
+        console.error("Error updating task completion:", error);
       }
-    } catch (error) {
-      console.error("Error updating task completion:", error);
-    }
-  }, [tasks, fetchTasks]);
+    },
+    [tasks, fetchTasks]
+  );
 
   const handleDeleteList = useCallback(async () => {
     try {
@@ -130,13 +144,17 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
   }, [fetchTasks]);
 
   return (
-    <div className="card space-y-4 border border-[var(--ctp-surface1)]"> {/* Use .card and theme border */}
+    <div className="card space-y-4 border border-[var(--ctp-surface1)]">
+      {" "}
+      {/* Use .card and theme border */}
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <h3 className="text-base font-semibold text-[var(--ctp-text)]">
             {taskList.name}
           </h3>
-          <h4 className="text-sm text-[var(--ctp-subtext0)]">{taskList.description}</h4>
+          <h4 className="text-sm text-[var(--ctp-subtext0)]">
+            {taskList.description}
+          </h4>
           {taskList.goal && (
             <span className="text-xs text-[var(--ctp-subtext1)] bg-[var(--ctp-surface0)] px-2 py-0.5 rounded-full">
               {taskList.goal.title}
@@ -172,7 +190,6 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
           </button>
         </div>
       </div>
-
       {showAddTask && (
         <div className="bg-[var(--ctp-surface0)] rounded-md p-3 border border-[var(--ctp-surface1)]">
           <div className="flex space-x-2">
@@ -186,8 +203,7 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
             />
             <button
               onClick={handleAddTask}
-              className="button-base bg-[var(--ctp-green)] text-[var(--ctp-base)] px-3 py-1 text-sm hover:opacity-80 disabled:opacity-70"
-              disabled={isAddingTask}
+              className="button-base bg-[var(--ctp-green)] text-[var(--ctp-base)] px-3 py-1 text-sm hover:opacity-80"
             >
               {isAddingTask ? "Adding..." : "Add"}
             </button>
@@ -197,89 +213,81 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
                 setShowAddTask(false);
                 setNewTaskTitle("");
               }}
-              className="button-secondary px-3 py-1 text-sm disabled:opacity-70"
-              disabled={isAddingTask}
+              className="button-secondary px-3 py-1 text-sm"
             >
               Cancel
             </button>
           </div>
         </div>
       )}
-
-import React from "react"; // Ensure React is imported for React.memo
-
-// ... other imports ...
-
-const TaskItem = React.memo(({ task, onTaskCompletion, onTaskEdit }) => {
-  return (
-    <div
-      className={`p-3 border rounded-md transition-colors ${
-        task.completed
-          ? "bg-[var(--ctp-green)]/10 border-[var(--ctp-green)]/30"
-          : "border-[var(--ctp-surface1)] bg-[var(--ctp-surface0)] hover:bg-[var(--ctp-surface1)]"
-      }`}
-    >
-      <div className="flex items-center space-x-3">
-        <input
-          type="checkbox"
-          checked={task.completed}
-          onChange={(e) => onTaskCompletion(task._id, e.target.checked)}
-          className="w-4 h-4 text-[var(--ctp-peach)] rounded focus:ring-[var(--ctp-peach)] cursor-pointer bg-[var(--ctp-surface1)] border-[var(--ctp-surface2)]"
-        />
-        <div className="flex-1 min-w-0">
-          <span
-            className={`block text-sm ${
-              task.completed ? "line-through text-[var(--ctp-subtext0)]" : "text-[var(--ctp-text)]"
+      <div className="space-y-2">
+        {tasks.map((task) => (
+          <div
+            key={task._id}
+            className={`p-3 border rounded-md transition-colors ${
+              task.completed
+                ? "bg-[var(--ctp-green)]/10 border-[var(--ctp-green)]/30" // Lighter green touch for completed
+                : "border-[var(--ctp-surface1)] bg-[var(--ctp-surface0)] hover:bg-[var(--ctp-surface1)]"
             }`}
           >
-            {task.title}
-          </span>
-          {task.description && (
-            <p className="text-xs text-[var(--ctp-overlay1)] mt-1 truncate">
-              {task.description}
-            </p>
-          )}
-        </div>
-        <button
-          onClick={() => onTaskEdit(task)}
-          className="text-[var(--ctp-sky)] hover:text-[var(--ctp-teal)] p-1"
-          title="Edit Task"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-          </svg>
-        </button>
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={(e) =>
+                  handleTaskCompletion(task._id, e.target.checked)
+                }
+                className="w-4 h-4 text-[var(--ctp-peach)] rounded focus:ring-[var(--ctp-peach)] cursor-pointer bg-[var(--ctp-surface1)] border-[var(--ctp-surface2)]"
+              />
+              <div className="flex-1 min-w-0">
+                <span
+                  className={`block text-sm ${
+                    task.completed
+                      ? "line-through text-[var(--ctp-subtext0)]"
+                      : "text-[var(--ctp-text)]"
+                  }`}
+                >
+                  {task.title}
+                </span>
+                {task.description && (
+                  <p className="text-xs text-[var(--ctp-overlay1)] mt-1 truncate">
+                    {task.description}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => handleTaskEdit(task)}
+                className="text-[var(--ctp-sky)] hover:text-[var(--ctp-teal)] p-1"
+                title="Edit Task"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
-  );
-});
-TaskItem.displayName = 'TaskItem';
-
-
-// ... TaskBoard component definition ...
-// Inside TaskBoard's return:
-      <div className="space-y-2 min-h-[50px]"> {/* Added min-h for loading state */}
-        {tasksLoading ? (
-          <p className="text-[var(--ctp-subtext0)] text-center py-4 text-sm">Loading tasks...</p>
-        ) : tasks.length > 0 ? (
-          tasks.map((task) => (
-            <TaskItem
-              key={task._id}
-              task={task}
-              onTaskCompletion={handleTaskCompletion}
-              onTaskEdit={handleTaskEdit}
-            />
-          ))
-        ) : (
-          <p className="text-[var(--ctp-subtext0)] text-center py-4 text-sm">
-            No tasks yet. Add your first task!
-          </p>
-        )}
-      </div>
-
+      {tasks.length === 0 && (
+        <p className="text-[var(--ctp-subtext0)] text-center py-4 text-sm">
+          No tasks yet. Add your first task!
+        </p>
+      )}
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-[var(--ctp-base)] bg-opacity-75 flex items-center justify-center p-4 z-50"> {/* Themed backdrop */}
+        <div className="fixed inset-0 bg-[var(--ctp-base)] bg-opacity-75 flex items-center justify-center p-4 z-50">
+          {" "}
+          {/* Themed backdrop */}
           <div className="bg-[var(--ctp-mantle)] rounded-lg p-4 max-w-sm w-full border border-[var(--ctp-surface1)] shadow-xl">
             <div className="flex items-center mb-3">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--ctp-red)]/30 flex items-center justify-center">
@@ -301,7 +309,9 @@ TaskItem.displayName = 'TaskItem';
                 <h3 className="text-base font-medium text-[var(--ctp-text)]">
                   Delete Task List
                 </h3>
-                <p className="text-xs text-[var(--ctp-subtext0)]">"{taskList.name}"</p>
+                <p className="text-xs text-[var(--ctp-subtext0)]">
+                  "{taskList.name}"
+                </p>
               </div>
             </div>
             <div className="bg-[var(--ctp-red)]/20 border border-[var(--ctp-red)]/50 rounded p-2 mb-3">
@@ -327,7 +337,6 @@ TaskItem.displayName = 'TaskItem';
           </div>
         </div>
       )}
-
       {showTaskModal && (
         <TaskModal // Assuming TaskModal will also need theming, or will inherit body styles
           task={selectedTask}
