@@ -27,33 +27,31 @@ export const createTaskList = async (req, res) => {
       return res.status(400).json({ message: "Task list name is required" });
     }
 
-    // Verify goal exists and belongs to user
-    const goal = await Goal.findOne({
+    // Verify goal exists and belongs to user, and select all necessary fields for the response
+    const goalData = await Goal.findOne({
       _id: goalId,
       user: req.user._id,
     })
-      .select("_id")
+      .select("title description targetDate priority category") // Select fields for response
       .lean();
 
-    if (!goal) {
+    if (!goalData) {
       return res.status(404).json({ message: "Goal not found" });
     }
 
-    const taskList = new TaskList({
+    let taskList = new TaskList({ // Use let as we will convert to object later
       name: name.trim(),
-      goal: goalId,
+      goal: goalId, // Keep goalId here for saving
       user: req.user._id,
     });
 
     await taskList.save();
 
-    // Populate goal information before sending response
-    await taskList.populate(
-      "goal",
-      "title description targetDate priority category"
-    );
+    // Convert to plain object to attach goalData manually
+    const taskListObject = taskList.toObject();
+    taskListObject.goal = goalData; // Attach the fetched goal data
 
-    res.status(201).json(taskList);
+    res.status(201).json(taskListObject);
   } catch (error) {
     console.error("Error creating task list:", error);
     res.status(500).json({ message: "Server error", error: error.message });

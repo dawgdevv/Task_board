@@ -10,23 +10,23 @@ const Navbar = ({ user, onLogout }) => {
 
   if (isHomePage) {
     return (
-      <header className="bg-gray-800 shadow-sm border-b border-gray-700">
+      <header className="bg-[var(--ctp-crust)] shadow-sm border-b border-[var(--ctp-surface0)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
               <span className="text-2xl">🎯</span>
-              <h1 className="text-2xl font-bold text-white">GoalFlow</h1>
+              <h1 className="text-2xl font-bold text-[var(--ctp-text)]">GoalFlow</h1>
             </div>
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigate("/login")}
-                className="text-gray-300 hover:text-white px-4 py-2 rounded-md transition-colors"
+                className="text-[var(--ctp-subtext0)] hover:text-[var(--ctp-text)] px-4 py-2 rounded-md transition-colors"
               >
                 Login
               </button>
               <button
                 onClick={() => navigate("/signup")}
-                className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+                className="button-primary px-6 py-2" // Use new button class
               >
                 Sign Up
               </button>
@@ -44,7 +44,7 @@ const Navbar = ({ user, onLogout }) => {
 
   // Goals page and goal detail pages
   return (
-    <header className="bg-gray-800 shadow-sm border-b border-gray-700">
+    <header className="bg-[var(--ctp-crust)] shadow-sm border-b border-[var(--ctp-surface0)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Left Section - Logo & Navigation */}
@@ -52,7 +52,7 @@ const Navbar = ({ user, onLogout }) => {
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <span className="text-2xl">🎯</span>
-              <h1 className="text-2xl font-bold text-white">GoalFlow</h1>
+              <h1 className="text-2xl font-bold text-[var(--ctp-text)]">GoalFlow</h1>
             </div>
 
             {/* Navigation Links */}
@@ -62,8 +62,8 @@ const Navbar = ({ user, onLogout }) => {
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   location.pathname === "/goals" ||
                   location.pathname.startsWith("/goal/")
-                    ? "bg-indigo-600 text-white"
-                    : "text-gray-300 hover:text-white hover:bg-gray-700"
+                    ? "bg-[var(--ctp-peach)] text-[var(--ctp-base)]" // Active state with vibrant color
+                    : "text-[var(--ctp-subtext0)] hover:text-[var(--ctp-text)] hover:bg-[var(--ctp-surface0)]"
                 }`}
               >
                 Goals
@@ -72,8 +72,8 @@ const Navbar = ({ user, onLogout }) => {
                 onClick={() => navigate("/timelogs")}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   location.pathname === "/timelogs"
-                    ? "bg-indigo-600 text-white"
-                    : "text-gray-300 hover:text-white hover:bg-gray-700"
+                    ? "bg-[var(--ctp-peach)] text-[var(--ctp-base)]" // Active state
+                    : "text-[var(--ctp-subtext0)] hover:text-[var(--ctp-text)] hover:bg-[var(--ctp-surface0)]"
                 }`}
               >
                 Time Logs
@@ -88,7 +88,7 @@ const Navbar = ({ user, onLogout }) => {
               <div className="hidden md:flex">
                 <button
                   onClick={() => navigate("/goals")}
-                  className="text-indigo-400 hover:text-indigo-300 flex items-center px-3 py-2 rounded-md transition-colors"
+                  className="text-[var(--ctp-sky)] hover:text-[var(--ctp-teal)] flex items-center px-3 py-2 rounded-md transition-colors"
                 >
                   <svg
                     className="w-4 h-4 mr-2"
@@ -115,7 +115,7 @@ const Navbar = ({ user, onLogout }) => {
               <select
                 onChange={(e) => navigate(e.target.value)}
                 value={location.pathname}
-                className="bg-gray-700 text-white px-3 py-2 rounded-md text-sm border border-gray-600 focus:ring-2 focus:ring-indigo-500"
+                className="input-field px-3 py-2 text-sm focus:ring-[var(--ctp-peach)]" // Use input-field class
               >
                 <option value="/goals">Goals</option>
                 <option value="/timelogs">Time Logs</option>
@@ -125,7 +125,7 @@ const Navbar = ({ user, onLogout }) => {
             {/* User Section */}
             <div className="hidden sm:flex items-center space-x-3">
               <ProfileIcon />
-              <span className="text-gray-300 text-sm">
+              <span className="text-[var(--ctp-subtext1)] text-sm">
                 Welcome, {user?.name}
               </span>
             </div>
@@ -138,7 +138,7 @@ const Navbar = ({ user, onLogout }) => {
             {/* Logout Button */}
             <button
               onClick={onLogout}
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+              className="button-danger px-4 py-2 text-sm font-medium" // Use new button-danger class
             >
               Logout
             </button>
