@@ -8,10 +8,11 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  useEffect(() => {
-    fetchTasks();
-  });
-  const fetchTasks = async () => {
+  const [tasksLoading, setTasksLoading] = useState(true);
+  const [isAddingTask, setIsAddingTask] = useState(false); // New state for add task button
+
+  const fetchTasks = useCallback(async () => {
+    setTasksLoading(true);
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -26,15 +27,31 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
       if (response.ok) {
         const data = await response.json();
         setTasks(data);
+      } else {
+        setTasks([]); // Clear tasks on error or if list not found
+        console.error("Failed to fetch tasks, status:", response.status);
       }
     } catch (error) {
       console.error("Error fetching tasks:", error);
+      setTasks([]); // Clear tasks on error
+    } finally {
+      setTasksLoading(false);
     }
-  };
+  }, [taskList._id]); // Dependency: taskList._id
 
-  const handleAddTask = async () => {
+  useEffect(() => {
+    if (taskList?._id) {
+      // Ensure taskList and its _id are available
+      fetchTasks();
+    } else {
+      setTasks([]); // Clear tasks if no valid taskList
+      setTasksLoading(false);
+    }
+  }, [fetchTasks, taskList?._id]); // fetchTasks is now a dependency
+
+  const handleAddTask = useCallback(async () => {
     if (!newTaskTitle.trim()) return;
-
+    setIsAddingTask(true);
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -45,97 +62,99 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            title: newTaskTitle,
-            listId: taskList._id,
-          }),
+          body: JSON.stringify({ title: newTaskTitle, listId: taskList._id }),
         }
       );
-
       if (response.ok) {
         setNewTaskTitle("");
         setShowAddTask(false);
         fetchTasks();
+      } else {
+        // Consider setting an error state here to display to the user
+        console.error("Failed to add task");
       }
     } catch (error) {
       console.error("Error adding task:", error);
+      // Consider setting an error state here
+    } finally {
+      setIsAddingTask(false);
     }
-  };
+  }, [newTaskTitle, taskList._id, fetchTasks]);
 
-  const handleTaskCompletion = async (taskId, completed) => {
-    try {
-      const token = localStorage.getItem("token");
-      const task = tasks.find((t) => t._id === taskId);
+  const handleTaskCompletion = useCallback(
+    async (taskId, completed) => {
+      try {
+        const token = localStorage.getItem("token");
+        const task = tasks.find((t) => t._id === taskId);
+        if (!task) return;
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title: task.title,
-            description: task.description,
-            completed: completed,
-          }),
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/tasks/${taskId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              title: task.title,
+              description: task.description,
+              completed: completed,
+            }),
+          }
+        );
+        if (response.ok) {
+          fetchTasks();
         }
-      );
-
-      if (response.ok) {
-        fetchTasks();
+      } catch (error) {
+        console.error("Error updating task completion:", error);
       }
-    } catch (error) {
-      console.error("Error updating task completion:", error);
-    }
-  };
+    },
+    [tasks, fetchTasks]
+  );
 
-  const handleDeleteList = async () => {
+  const handleDeleteList = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/tasks/lists/${taskList._id}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       if (response.ok) {
         setShowDeleteConfirm(false);
-        if (onDelete) {
-          onDelete(taskList._id);
-        }
-        if (onUpdate) {
-          onUpdate();
-        }
+        if (onDelete) onDelete(taskList._id);
+        if (onUpdate) onUpdate();
       }
     } catch (error) {
       console.error("Error deleting list:", error);
     }
-  };
+  }, [taskList._id, onDelete, onUpdate]);
 
-  const handleTaskEdit = (task) => {
+  const handleTaskEdit = useCallback((task) => {
     setSelectedTask(task);
     setShowTaskModal(true);
-  };
+  }, []);
 
-  const handleTaskUpdate = () => {
+  const handleTaskUpdate = useCallback(() => {
     fetchTasks();
     setShowTaskModal(false);
-  };
+  }, [fetchTasks]);
 
   return (
-    <div className="card space-y-4 border border-[var(--ctp-surface1)]"> {/* Use .card and theme border */}
+    <div className="card space-y-4 border border-[var(--ctp-surface1)]">
+      {" "}
+      {/* Use .card and theme border */}
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <h3 className="text-base font-semibold text-[var(--ctp-text)]">
             {taskList.name}
           </h3>
-          <h4 className="text-sm text-[var(--ctp-subtext0)]">{taskList.description}</h4>
+          <h4 className="text-sm text-[var(--ctp-subtext0)]">
+            {taskList.description}
+          </h4>
           {taskList.goal && (
             <span className="text-xs text-[var(--ctp-subtext1)] bg-[var(--ctp-surface0)] px-2 py-0.5 rounded-full">
               {taskList.goal.title}
@@ -171,7 +190,6 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
           </button>
         </div>
       </div>
-
       {showAddTask && (
         <div className="bg-[var(--ctp-surface0)] rounded-md p-3 border border-[var(--ctp-surface1)]">
           <div className="flex space-x-2">
@@ -187,10 +205,11 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
               onClick={handleAddTask}
               className="button-base bg-[var(--ctp-green)] text-[var(--ctp-base)] px-3 py-1 text-sm hover:opacity-80"
             >
-              Add
+              {isAddingTask ? "Adding..." : "Add"}
             </button>
             <button
               onClick={() => {
+                if (isAddingTask) return; // Prevent closing while adding
                 setShowAddTask(false);
                 setNewTaskTitle("");
               }}
@@ -201,7 +220,6 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
           </div>
         </div>
       )}
-
       <div className="space-y-2">
         {tasks.map((task) => (
           <div
@@ -224,7 +242,9 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
               <div className="flex-1 min-w-0">
                 <span
                   className={`block text-sm ${
-                    task.completed ? "line-through text-[var(--ctp-subtext0)]" : "text-[var(--ctp-text)]"
+                    task.completed
+                      ? "line-through text-[var(--ctp-subtext0)]"
+                      : "text-[var(--ctp-text)]"
                   }`}
                 >
                   {task.title}
@@ -258,16 +278,16 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
           </div>
         ))}
       </div>
-
       {tasks.length === 0 && (
         <p className="text-[var(--ctp-subtext0)] text-center py-4 text-sm">
           No tasks yet. Add your first task!
         </p>
       )}
-
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-[var(--ctp-base)] bg-opacity-75 flex items-center justify-center p-4 z-50"> {/* Themed backdrop */}
+        <div className="fixed inset-0 bg-[var(--ctp-base)] bg-opacity-75 flex items-center justify-center p-4 z-50">
+          {" "}
+          {/* Themed backdrop */}
           <div className="bg-[var(--ctp-mantle)] rounded-lg p-4 max-w-sm w-full border border-[var(--ctp-surface1)] shadow-xl">
             <div className="flex items-center mb-3">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--ctp-red)]/30 flex items-center justify-center">
@@ -289,7 +309,9 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
                 <h3 className="text-base font-medium text-[var(--ctp-text)]">
                   Delete Task List
                 </h3>
-                <p className="text-xs text-[var(--ctp-subtext0)]">"{taskList.name}"</p>
+                <p className="text-xs text-[var(--ctp-subtext0)]">
+                  "{taskList.name}"
+                </p>
               </div>
             </div>
             <div className="bg-[var(--ctp-red)]/20 border border-[var(--ctp-red)]/50 rounded p-2 mb-3">
@@ -315,7 +337,6 @@ const TaskBoard = ({ taskList, onUpdate, onDelete }) => {
           </div>
         </div>
       )}
-
       {showTaskModal && (
         <TaskModal // Assuming TaskModal will also need theming, or will inherit body styles
           task={selectedTask}

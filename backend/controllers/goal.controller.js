@@ -5,14 +5,28 @@ import mongoose from "mongoose";
 
 export const allgoals = async (req, res) => {
   try {
-    const goals = await Goal.find({ user: req.user._id })
-      .select(
-        "title description targetDate priority category completed createdAt"
-      )
-      .sort({ createdAt: -1 })
-      .lean();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10; // Default limit to 10
+    const skip = (page - 1) * limit;
 
-    res.json(goals);
+    const [goals, totalGoals] = await Promise.all([
+      Goal.find({ user: req.user._id })
+        .select(
+          "title description targetDate priority category completed createdAt"
+        )
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Goal.countDocuments({ user: req.user._id }),
+    ]);
+
+    res.json({
+      goals,
+      currentPage: page,
+      totalPages: Math.ceil(totalGoals / limit),
+      totalGoals,
+    });
   } catch (error) {
     console.error("Error fetching goals:", error);
     res.status(500).json({ message: "Server error", error: error.message });

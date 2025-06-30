@@ -63,13 +63,13 @@ const TaskModal = ({ task, onClose, onUpdate }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-gray-800 rounded-lg max-w-md w-full p-5 border border-gray-700">
+    <div className="fixed inset-0 bg-[var(--ctp-base)] bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="card max-w-md w-full p-5"> {/* Use .card class */}
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-white">Edit Task</h3>
+          <h3 className="text-lg font-semibold text-[var(--ctp-text)]">Edit Task</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-300 p-1"
+            className="text-[var(--ctp-subtext0)] hover:text-[var(--ctp-text)] p-1 rounded-full hover:bg-[var(--ctp-surface0)]"
           >
             <svg
               className="w-5 h-5"
@@ -89,28 +89,28 @@ const TaskModal = ({ task, onClose, onUpdate }) => {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--ctp-subtext0)] mb-2">
               Task Title
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field w-full px-3 py-2 placeholder-[var(--ctp-overlay0)]"
               placeholder="Enter task title..."
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--ctp-subtext0)] mb-2">
               Description
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows="4"
-              className="w-full px-3 py-2 bg-gray-700 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="input-field w-full px-3 py-2 placeholder-[var(--ctp-overlay0)] resize-none"
               placeholder="Add task description..."
             />
           </div>
@@ -118,33 +118,33 @@ const TaskModal = ({ task, onClose, onUpdate }) => {
           <div className="flex space-x-3 pt-2">
             <button
               onClick={handleUpdate}
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+              className="button-primary flex-1 py-2 px-4"
             >
               Save Changes
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors"
+              className="button-danger py-2 px-4"
             >
               Delete
             </button>
           </div>
 
           {showDeleteConfirm && (
-            <div className="mt-4 p-3 bg-gray-700 rounded-md border border-red-600">
-              <p className="text-sm text-gray-300 mb-3">
+            <div className="mt-4 p-3 bg-[var(--ctp-surface0)] rounded-md border border-[var(--ctp-red)]/50">
+              <p className="text-sm text-[var(--ctp-subtext0)] mb-3">
                 Are you sure you want to delete this task?
               </p>
               <div className="flex space-x-2">
                 <button
                   onClick={handleDelete}
-                  className="flex-1 bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 text-sm"
+                  className="button-danger flex-1 py-2 px-3 text-sm"
                 >
                   Yes, Delete
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 bg-gray-600 text-white py-2 px-3 rounded-md hover:bg-gray-500 text-sm"
+                  className="button-secondary flex-1 py-2 px-3 text-sm"
                 >
                   Cancel
                 </button>
