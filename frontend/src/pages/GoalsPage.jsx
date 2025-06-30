@@ -79,50 +79,56 @@ const GoalsPage = () => {
     navigate("/login");
   };
 
-  const handleCreateGoal = useCallback(async (e) => {
-    e.preventDefault();
-    if (!formData.title.trim()) return;
-    setIsCreatingGoal(true); // Set loading state for button
+  const handleCreateGoal = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (!formData.title.trim()) return;
+      setIsCreatingGoal(true); // Set loading state for button
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/goals`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/goals`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(formData),
+          }
+        );
+
+        if (response.ok) {
+          await fetchGoals(); // fetchGoals is already memoized
+          setFormData({
+            title: "",
+            description: "",
+            targetDate: "",
+            priority: "medium",
+            category: "",
+          });
+          setShowCreateGoal(false);
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          setError(errorData.message || "Failed to create goal");
         }
-      );
-
-      if (response.ok) {
-        await fetchGoals(); // fetchGoals is already memoized
-        setFormData({
-          title: "",
-          description: "",
-          targetDate: "",
-          priority: "medium",
-          category: "",
-        });
-        setShowCreateGoal(false);
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        setError(errorData.message || "Failed to create goal");
+      } catch (error) {
+        console.error("Error creating goal:", error);
+        setError("Failed to create goal. Please try again.");
+      } finally {
+        setIsCreatingGoal(false); // Reset loading state for button
       }
-    } catch (error) {
-      console.error("Error creating goal:", error);
-      setError("Failed to create goal. Please try again.");
-    } finally {
-      setIsCreatingGoal(false); // Reset loading state for button
-    }
-  }, [formData, fetchGoals]);
+    },
+    [formData, fetchGoals]
+  );
 
-  const handleGoalClick = useCallback((goalId) => {
-    navigate(`/goal/${goalId}`);
-  }, [navigate]); // Added navigate dependency
+  const handleGoalClick = useCallback(
+    (goalId) => {
+      navigate(`/goal/${goalId}`);
+    },
+    [navigate]
+  ); // Added navigate dependency
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -145,46 +151,27 @@ const GoalsPage = () => {
     return diffDays;
   };
 
-  const formatDescription = (description) => {
-    if (!description) return null;
-    const lines = description.split("\n").filter((line) => line.trim() !== "");
-    return lines.map((line, index) => {
-      const trimmedLine = line.trim();
-      const isBulletPoint = /^[-*•]/.test(trimmedLine) || /^\d+\./.test(trimmedLine);
-      if (isBulletPoint) {
-        return (
-          <div key={index} className="flex items-start space-x-2 mb-1">
-            <span className="text-[var(--ctp-peach)] mt-1">•</span> {/* Themed bullet */}
-            <span className="text-[var(--ctp-subtext1)]"> {/* Themed text */}
-              {trimmedLine.replace(/^[-*•]\s*/, "").replace(/^\d+\.\s*/, "")}
-            </span>
-          </div>
-        );
-      } else {
-        return (
-          <p key={index} className="mb-2 text-[var(--ctp-subtext1)]"> {/* Themed text */}
-            {trimmedLine}
-          </p>
-        );
-      }
-    });
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center"> {/* bg-gray-900 removed */}
+      <div className="min-h-screen flex items-center justify-center">
+        {" "}
+        {/* bg-gray-900 removed */}
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[var(--ctp-peach)] mx-auto"></div> {/* Themed spinner */}
-          <p className="mt-4 text-[var(--ctp-subtext0)]">Loading your workspace...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[var(--ctp-peach)] mx-auto"></div>{" "}
+          {/* Themed spinner */}
+          <p className="mt-4 text-[var(--ctp-subtext0)]">
+            Loading your workspace...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen"> {/* bg-gray-900 removed */}
+    <div className="min-h-screen">
+      {" "}
+      {/* bg-gray-900 removed */}
       <Navbar user={user} onLogout={handleLogout} />
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[var(--ctp-text)] mb-2">
@@ -198,9 +185,13 @@ const GoalsPage = () => {
         {/* Quick Stats */}
         {goals.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="card p-6"> {/* Use .card class */}
+            <div className="card p-6">
+              {" "}
+              {/* Use .card class */}
               <div className="flex items-center">
-                <div className="p-2 bg-[var(--ctp-surface0)] rounded-lg"> {/* Themed icon bg */}
+                <div className="p-2 bg-[var(--ctp-surface0)] rounded-lg">
+                  {" "}
+                  {/* Themed icon bg */}
                   <svg
                     className="w-6 h-6 text-[var(--ctp-peach)]" // Themed icon color
                     fill="none"
@@ -216,7 +207,9 @@ const GoalsPage = () => {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <p className="text-[var(--ctp-subtext1)] text-sm">Total Goals</p>
+                  <p className="text-[var(--ctp-subtext1)] text-sm">
+                    Total Goals
+                  </p>
                   <p className="text-2xl font-bold text-[var(--ctp-text)]">
                     {goals.length}
                   </p>
@@ -224,9 +217,13 @@ const GoalsPage = () => {
               </div>
             </div>
 
-            <div className="card p-6"> {/* Use .card class */}
+            <div className="card p-6">
+              {" "}
+              {/* Use .card class */}
               <div className="flex items-center">
-                <div className="p-2 bg-[var(--ctp-surface0)] rounded-lg"> {/* Themed icon bg */}
+                <div className="p-2 bg-[var(--ctp-surface0)] rounded-lg">
+                  {" "}
+                  {/* Themed icon bg */}
                   <svg
                     className="w-6 h-6 text-[var(--ctp-red)]" // Themed icon color (High Prio)
                     fill="none"
@@ -242,7 +239,9 @@ const GoalsPage = () => {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <p className="text-[var(--ctp-subtext1)] text-sm">High Priority</p>
+                  <p className="text-[var(--ctp-subtext1)] text-sm">
+                    High Priority
+                  </p>
                   <p className="text-2xl font-bold text-[var(--ctp-text)]">
                     {goals.filter((goal) => goal.priority === "high").length}
                   </p>
@@ -250,9 +249,13 @@ const GoalsPage = () => {
               </div>
             </div>
 
-            <div className="card p-6"> {/* Use .card class */}
+            <div className="card p-6">
+              {" "}
+              {/* Use .card class */}
               <div className="flex items-center">
-                <div className="p-2 bg-[var(--ctp-surface0)] rounded-lg"> {/* Themed icon bg */}
+                <div className="p-2 bg-[var(--ctp-surface0)] rounded-lg">
+                  {" "}
+                  {/* Themed icon bg */}
                   <svg
                     className="w-6 h-6 text-[var(--ctp-yellow)]" // Themed icon color (Due Soon)
                     fill="none"
@@ -268,7 +271,9 @@ const GoalsPage = () => {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <p className="text-[var(--ctp-subtext1)] text-sm">Due This Month</p>
+                  <p className="text-[var(--ctp-subtext1)] text-sm">
+                    Due This Month
+                  </p>
                   <p className="text-2xl font-bold text-[var(--ctp-text)]">
                     {
                       goals.filter((goal) => {
@@ -286,7 +291,9 @@ const GoalsPage = () => {
         {/* Goals Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-[var(--ctp-text)]">Your Goals</h2>
+            <h2 className="text-2xl font-bold text-[var(--ctp-text)]">
+              Your Goals
+            </h2>
             <button
               onClick={() => setShowCreateGoal(true)}
               className="button-primary flex items-center font-medium px-6 py-3" // Use .button-primary
@@ -310,7 +317,9 @@ const GoalsPage = () => {
 
           {/* Create Goal Form */}
           {showCreateGoal && (
-            <div className="card mb-8 p-6"> {/* Use .card class */}
+            <div className="card mb-8 p-6">
+              {" "}
+              {/* Use .card class */}
               <h3 className="text-lg font-semibold text-[var(--ctp-text)] mb-4">
                 Create New Goal
               </h3>
@@ -347,7 +356,9 @@ const GoalsPage = () => {
 • Or write in paragraphs
 • Each line will be formatted automatically"
                   />
-                  <p className="text-xs text-[var(--ctp-overlay1)] mt-1"> {/* Themed tip text */}
+                  <p className="text-xs text-[var(--ctp-overlay1)] mt-1">
+                    {" "}
+                    {/* Themed tip text */}
                     Tip: Start lines with -, *, • or numbers for bullet points
                   </p>
                 </div>
@@ -424,113 +435,79 @@ const GoalsPage = () => {
         </div>
 
         {error && (
-          <div className="bg-[var(--ctp-red)]/20 border border-[var(--ctp-red)]/50 text-[var(--ctp-red)] px-4 py-3 rounded-lg mb-6"> {/* Themed error */}
+          <div className="bg-[var(--ctp-red)]/20 border border-[var(--ctp-red)]/50 text-[var(--ctp-red)] px-4 py-3 rounded-lg mb-6">
+            {" "}
+            {/* Themed error */}
             {error}
           </div>
         )}
-
-import React, { useState, useEffect, useCallback } from "react"; // Import React if not already
-
-// Helper function (already defined in the component, kept here for clarity if extracted)
-const formatDescriptionForCard = (description) => {
-  if (!description) return null;
-  const lines = description.split("\n").filter((line) => line.trim() !== "");
-  return lines.map((line, index) => {
-    const trimmedLine = line.trim();
-    const isBulletPoint = /^[-*•]/.test(trimmedLine) || /^\d+\./.test(trimmedLine);
-    if (isBulletPoint) {
-      return (
-        <div key={index} className="flex items-start space-x-2 mb-1">
-          <span className="text-[var(--ctp-peach)] mt-1">•</span>
-          <span className="text-[var(--ctp-subtext1)]">
-            {trimmedLine.replace(/^[-*•]\s*/, "").replace(/^\d+\.\s*/, "")}
-          </span>
-        </div>
-      );
-    } else {
-      return (
-        <p key={index} className="mb-2 text-[var(--ctp-subtext1)]">
-          {trimmedLine}
-        </p>
-      );
-    }
-  });
-};
-
-const GoalCard = React.memo(({ goal, onGoalClick, getPriorityColor, getDaysRemaining }) => {
-  return (
-    <div
-      onClick={() => onGoalClick(goal._id)}
-      className="card p-6 cursor-pointer hover:bg-[var(--ctp-surface0)] transition-all duration-200 hover:border-[var(--ctp-surface2)] hover:shadow-xl transform hover:-translate-y-1"
-    >
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-bold text-[var(--ctp-text)] mb-2 line-clamp-2">
-          🎯 {goal.title}
-        </h3>
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-            goal.priority
-          )}`}
-        >
-          {goal.priority}
-        </span>
-      </div>
-
-      {goal.description && (
-        <div className="text-[var(--ctp-subtext1)] text-sm mb-4 max-h-20 overflow-hidden">
-          {formatDescriptionForCard(goal.description)}
-        </div>
-      )}
-
-      <div className="flex flex-wrap gap-2 mb-4">
-        {goal.category && (
-          <span className="bg-[var(--ctp-sky)]/30 text-[var(--ctp-sky)] px-2 py-1 rounded-full text-xs">
-            {goal.category}
-          </span>
-        )}
-        <span className="bg-[var(--ctp-surface1)] text-[var(--ctp-subtext0)] px-2 py-1 rounded-full text-xs">
-          Due: {new Date(goal.targetDate).toLocaleDateString()}
-        </span>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <div className="text-sm">
-          {getDaysRemaining(goal.targetDate) > 0 ? (
-            <span className="text-[var(--ctp-green)] font-medium">
-              {getDaysRemaining(goal.targetDate)} days left
-            </span>
-          ) : (
-            <span className="text-[var(--ctp-red)] font-medium">Overdue</span>
-          )}
-        </div>
-        <div className="text-[var(--ctp-peach)] text-sm font-medium">
-          Click to manage →
-        </div>
-      </div>
-    </div>
-  );
-});
-GoalCard.displayName = 'GoalCard'; // For better debugging
-
-// ... (rest of the GoalsPage component code above this) ...
 
         {/* Goals Grid */}
         {goals.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {goals.map((goal) => (
-              <GoalCard
+              <div
                 key={goal._id}
-                goal={goal}
-                onGoalClick={handleGoalClick}
-                getPriorityColor={getPriorityColor}
-                getDaysRemaining={getDaysRemaining}
-              />
+                onClick={() => handleGoalClick(goal._id)}
+                className="card p-6 cursor-pointer hover:bg-[var(--ctp-surface0)] transition-all duration-200 hover:border-[var(--ctp-surface2)] hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-bold text-[var(--ctp-text)] mb-2 line-clamp-2">
+                    🎯 {goal.title}
+                  </h3>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(
+                      goal.priority
+                    )}`}
+                  >
+                    {goal.priority}
+                  </span>
+                </div>
+
+                {goal.description && (
+                  <div className="text-[var(--ctp-subtext1)] text-sm mb-4 max-h-20 overflow-hidden">
+                    <p className="line-clamp-3">{goal.description}</p>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {goal.category && (
+                    <span className="bg-[var(--ctp-sky)]/30 text-[var(--ctp-sky)] px-2 py-1 rounded-full text-xs">
+                      {goal.category}
+                    </span>
+                  )}
+                  <span className="bg-[var(--ctp-surface1)] text-[var(--ctp-subtext0)] px-2 py-1 rounded-full text-xs">
+                    Due: {new Date(goal.targetDate).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div className="text-sm">
+                    {getDaysRemaining(goal.targetDate) > 0 ? (
+                      <span className="text-[var(--ctp-green)] font-medium">
+                        {getDaysRemaining(goal.targetDate)} days left
+                      </span>
+                    ) : (
+                      <span className="text-[var(--ctp-red)] font-medium">
+                        Overdue
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[var(--ctp-peach)] text-sm font-medium">
+                    Click to manage →
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         ) : (
           <div className="text-center py-16">
-            <div className="card p-12 max-w-md mx-auto"> {/* Use .card class */}
-              <div className="text-[var(--ctp-overlay0)] mb-6"> {/* Themed icon color */}
+            <div className="card p-12 max-w-md mx-auto">
+              {" "}
+              {/* Use .card class */}
+              <div className="text-[var(--ctp-overlay0)] mb-6">
+                {" "}
+                {/* Themed icon color */}
                 <svg
                   className="w-20 h-20 mx-auto"
                   fill="none"
