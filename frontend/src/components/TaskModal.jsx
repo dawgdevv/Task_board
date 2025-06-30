@@ -63,13 +63,15 @@ const TaskModal = ({ task, onClose, onUpdate }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-[var(--ctp-base)] bg-opacity-80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="card max-w-md w-full p-5"> {/* Use .card class */}
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-[var(--ctp-text)]">Edit Task</h3>
+    <div className="fixed inset-0 bg-[var(--ctp-base)]/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="card max-w-md w-full p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-semibold text-[var(--ctp-text)]">
+            Edit Task
+          </h3>
           <button
             onClick={onClose}
-            className="text-[var(--ctp-subtext0)] hover:text-[var(--ctp-text)] p-1 rounded-full hover:bg-[var(--ctp-surface0)]"
+            className="text-[var(--ctp-subtext0)] hover:text-[var(--ctp-text)] p-2 rounded-md hover:bg-[var(--ctp-surface0)] transition-all"
           >
             <svg
               className="w-5 h-5"
@@ -115,36 +117,37 @@ const TaskModal = ({ task, onClose, onUpdate }) => {
             />
           </div>
 
-          <div className="flex space-x-3 pt-2">
+          <div className="flex space-x-3 pt-4">
             <button
               onClick={handleUpdate}
-              className="button-primary flex-1 py-2 px-4"
+              className="button-primary flex-1 py-2 px-4 font-medium"
             >
               Save Changes
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="button-danger py-2 px-4"
+              className="button-danger py-2 px-4 font-medium"
             >
               Delete
             </button>
           </div>
 
           {showDeleteConfirm && (
-            <div className="mt-4 p-3 bg-[var(--ctp-surface0)] rounded-md border border-[var(--ctp-red)]/50">
-              <p className="text-sm text-[var(--ctp-subtext0)] mb-3">
-                Are you sure you want to delete this task?
+            <div className="mt-6 p-4 bg-[var(--ctp-red)]/10 rounded-md border border-[var(--ctp-red)]/30">
+              <p className="text-sm text-[var(--ctp-red)] mb-4">
+                Are you sure you want to delete this task? This action cannot be
+                undone.
               </p>
-              <div className="flex space-x-2">
+              <div className="flex space-x-3">
                 <button
                   onClick={handleDelete}
-                  className="button-danger flex-1 py-2 px-3 text-sm"
+                  className="button-danger flex-1 py-2 px-3 text-sm font-medium"
                 >
                   Yes, Delete
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="button-secondary flex-1 py-2 px-3 text-sm"
+                  className="button-secondary flex-1 py-2 px-3 text-sm font-medium"
                 >
                   Cancel
                 </button>

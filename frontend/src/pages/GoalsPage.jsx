@@ -38,7 +38,7 @@ const GoalsPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setGoals(data);
+        setGoals(data.goals || []);
       } else if (response.status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -452,7 +452,14 @@ const GoalsPage = () => {
                 className="card p-6 cursor-pointer hover:bg-[var(--ctp-surface0)] transition-all duration-200 hover:border-[var(--ctp-surface2)] hover:shadow-xl transform hover:-translate-y-1"
               >
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-[var(--ctp-text)] mb-2 line-clamp-2">
+                  <h3
+                    className="text-xl font-bold text-[var(--ctp-text)] mb-2 overflow-hidden text-ellipsis"
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
                     🎯 {goal.title}
                   </h3>
                   <span
@@ -466,7 +473,16 @@ const GoalsPage = () => {
 
                 {goal.description && (
                   <div className="text-[var(--ctp-subtext1)] text-sm mb-4 max-h-20 overflow-hidden">
-                    <p className="line-clamp-3">{goal.description}</p>
+                    <p
+                      className="overflow-hidden text-ellipsis"
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {goal.description}
+                    </p>
                   </div>
                 )}
 
