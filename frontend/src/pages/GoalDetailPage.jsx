@@ -323,7 +323,7 @@ const GoalDetailPage = () => {
                 {goal.title}
               </h2>
               {goal.description && (
-                <div className="text-xl text-[var(--ctp-subtext1)] mb-3">
+                <div className="text-2xl text-[var(--ctp-subtext1)] mb-3">
                   {formatDescription(goal.description)}
                 </div>
               )}
