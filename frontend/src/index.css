@@ -1,1 +1,79 @@
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    --ctp-rosewater: #f5e0dc;
+    --ctp-flamingo: #f2cdcd;
+    --ctp-pink: #f5c2e7;
+    --ctp-mauve: #cba6f7; /* Purple - avoid for buttons */
+    --ctp-red: #f38ba8;
+    --ctp-maroon: #eba0ac;
+    --ctp-peach: #fab387; /* Vibrant button candidate */
+    --ctp-yellow: #f9e2af; /* Vibrant button candidate */
+    --ctp-green: #a6e3a1; /* Vibrant button candidate */
+    --ctp-teal: #94e2d5;
+    --ctp-sky: #89dceb;
+    --ctp-sapphire: #74c7ec; /* Blue - avoid for buttons */
+    --ctp-blue: #89b4fa; /* Blue - avoid for buttons */
+    --ctp-lavender: #b4befe;
+
+    --ctp-text: #cdd6f4;
+    --ctp-subtext1: #bac2de;
+    --ctp-subtext0: #a6adc8;
+
+    --ctp-overlay2: #9399b2;
+    --ctp-overlay1: #7f849c;
+    --ctp-overlay0: #6c7086;
+
+    --ctp-surface2: #585b70;
+    --ctp-surface1: #45475a;
+    --ctp-surface0: #313244;
+
+    --ctp-base: #1e1e2e;   /* Main background */
+    --ctp-mantle: #181825; /* Secondary background (e.g., cards, sidebars) */
+    --ctp-crust: #11111b;  /* Tertiary background (e.g., header/footer bars) */
+
+    /* Semantic colors for buttons (examples) */
+    --button-primary-bg: var(--ctp-peach);
+    --button-primary-text: var(--ctp-base);
+    --button-secondary-bg: var(--ctp-surface0);
+    --button-secondary-text: var(--ctp-text);
+    --button-danger-bg: var(--ctp-red);
+    --button-danger-text: var(--ctp-base);
+  }
+
+  body {
+    @apply bg-[var(--ctp-base)] text-[var(--ctp-text)];
+    font-family: 'Inter', sans-serif; /* Example font, adjust if project has a specific one */
+  }
+
+  /* General styles for better dark mode appearance */
+  .card {
+    @apply bg-[var(--ctp-mantle)] p-4 rounded-lg shadow-md;
+  }
+
+  .input-field {
+    @apply bg-[var(--ctp-surface0)] text-[var(--ctp-text)] border border-[var(--ctp-surface1)] rounded-md p-2 focus:ring-[var(--ctp-peach)] focus:border-[var(--ctp-peach)];
+  }
+
+  .button-base {
+    @apply px-4 py-2 rounded-md font-semibold focus:outline-none transition-colors duration-150;
+  }
+
+  .button-primary {
+    @apply button-base bg-[var(--button-primary-bg)] text-[var(--button-primary-text)] hover:bg-opacity-80;
+  }
+
+  .button-secondary {
+    @apply button-base bg-[var(--button-secondary-bg)] text-[var(--button-secondary-text)] hover:bg-[var(--ctp-surface1)];
+  }
+
+  .button-danger {
+    @apply button-base bg-[var(--button-danger-bg)] text-[var(--button-danger-text)] hover:bg-opacity-80;
+  }
+
+  /* Example: Style links to be more visible in dark mode */
+  a {
+    @apply text-[var(--ctp-sky)] hover:text-[var(--ctp-teal)];
+  }
+}
