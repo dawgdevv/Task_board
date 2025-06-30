@@ -11,10 +11,10 @@ RUN npm ci --only=production
 COPY . .
 
 RUN addgroup -g 1001 -S nodejs
-RUN adduser -S goalflow -u 1001
+RUN adduser -S taskly -u 1001
 
-RUN chown -R goalflow:nodejs /app
-USER goalflow
+RUN chown -R taskly:nodejs /app
+USER taskly
 
 
 EXPOSE 5000

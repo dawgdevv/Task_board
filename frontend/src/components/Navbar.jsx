@@ -15,7 +15,9 @@ const Navbar = ({ user, onLogout }) => {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
               <span className="text-2xl">🎯</span>
-              <h1 className="text-2xl font-bold text-[var(--ctp-text)]">GoalFlow</h1>
+              <h1 className="text-2xl font-bold text-[var(--ctp-text)]">
+                Taskly
+              </h1>
             </div>
             <div className="flex items-center space-x-4">
               <button
@@ -52,7 +54,9 @@ const Navbar = ({ user, onLogout }) => {
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <span className="text-2xl">🎯</span>
-              <h1 className="text-2xl font-bold text-[var(--ctp-text)]">GoalFlow</h1>
+              <h1 className="text-2xl font-bold text-[var(--ctp-text)]">
+                Taskly
+              </h1>
             </div>
 
             {/* Navigation Links */}

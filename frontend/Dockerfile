@@ -25,9 +25,9 @@ COPY --from=builder /app/dist ./dist
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
-RUN adduser -S goalflow -u 1001
-RUN chown -R goalflow:nodejs /app
-USER goalflow
+RUN adduser -S taskly -u 1001
+RUN chown -R taskly:nodejs /app
+USER taskly
 
 # Expose port
 EXPOSE 5173

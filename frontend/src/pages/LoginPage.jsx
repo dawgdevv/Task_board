@@ -45,6 +45,7 @@ const LoginPage = () => {
         setError(data.message || "Login failed");
       }
     } catch (error) {
+      console.error("Login error:", error);
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -52,7 +53,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"> {/* bg-gray-900 removed, inherits from body */}
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      {" "}
+      {/* bg-gray-900 removed, inherits from body */}
       <div className="max-w-md w-full space-y-8">
         <div className="text-center mb-8">
           <button
@@ -76,15 +79,18 @@ const LoginPage = () => {
           </button>
           <div className="flex items-center justify-center space-x-2 mb-4">
             <span className="text-2xl text-[var(--ctp-text)]">🎯</span>
-            <h1 className="text-2xl font-bold text-[var(--ctp-text)]">GoalFlow</h1>
+            <h1 className="text-2xl font-bold text-[var(--ctp-text)]">
+              Taskly
+            </h1>
           </div>
         </div>
 
-        <div className="card p-8 shadow-xl"> {/* Use .card class */}
+        <div className="card p-8 shadow-xl">
+          {" "}
+          {/* Use .card class */}
           <h2 className="text-3xl font-extrabold text-[var(--ctp-text)] text-center mb-8">
             Sign in to your account
           </h2>
-
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-[var(--ctp-red)]/20 border border-[var(--ctp-red)]/50 text-[var(--ctp-red)] px-4 py-3 rounded-lg">

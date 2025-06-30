@@ -54,7 +54,7 @@ const HomePage = () => {
             <div className="text-6xl mr-4">🎯</div>
             <div>
               <h1 className="text-5xl md:text-6xl font-bold text-[var(--ctp-text)]">
-                GoalFlow
+                Taskly
               </h1>
               <p className="text-lg text-[var(--ctp-peach)] font-medium">
                 Turn Dreams into Achievements
@@ -64,7 +64,10 @@ const HomePage = () => {
 
           <h2 className="text-4xl md:text-5xl font-bold text-[var(--ctp-text)] mb-6">
             Your Journey from
-            <span className="block text-[var(--ctp-peach)]"> Goals to Success </span>
+            <span className="block text-[var(--ctp-peach)]">
+              {" "}
+              Goals to Success{" "}
+            </span>
           </h2>
 
           <p className="text-xl text-[var(--ctp-subtext0)] mb-8 max-w-3xl mx-auto">
@@ -95,7 +98,9 @@ const HomePage = () => {
                 <div className="w-16 h-16 bg-[var(--ctp-surface0)] rounded-full flex items-center justify-center mb-4">
                   <span className="text-2xl text-[var(--ctp-peach)]">🎯</span>
                 </div>
-                <h3 className="font-bold text-[var(--ctp-text)] mb-2">Set Goals</h3>
+                <h3 className="font-bold text-[var(--ctp-text)] mb-2">
+                  Set Goals
+                </h3>
                 <p className="text-[var(--ctp-subtext1)] text-sm">
                   Define what you want to achieve
                 </p>
@@ -104,7 +109,9 @@ const HomePage = () => {
                 <div className="w-16 h-16 bg-[var(--ctp-surface0)] rounded-full flex items-center justify-center mb-4">
                   <span className="text-2xl text-[var(--ctp-green)]">📋</span>
                 </div>
-                <h3 className="font-bold text-[var(--ctp-text)] mb-2">Plan Actions</h3>
+                <h3 className="font-bold text-[var(--ctp-text)] mb-2">
+                  Plan Actions
+                </h3>
                 <p className="text-[var(--ctp-subtext1)] text-sm">
                   Break it down into manageable steps
                 </p>
@@ -113,7 +120,9 @@ const HomePage = () => {
                 <div className="w-16 h-16 bg-[var(--ctp-surface0)] rounded-full flex items-center justify-center mb-4">
                   <span className="text-2xl text-[var(--ctp-yellow)]">🏆</span>
                 </div>
-                <h3 className="font-bold text-[var(--ctp-text)] mb-2">Achieve Success</h3>
+                <h3 className="font-bold text-[var(--ctp-text)] mb-2">
+                  Achieve Success
+                </h3>
                 <p className="text-[var(--ctp-subtext1)] text-sm">
                   Track progress and celebrate wins
                 </p>
@@ -153,7 +162,9 @@ const HomePage = () => {
               <h3 className="text-xl font-semibold text-[var(--ctp-text)] mb-2">
                 {feature.title}
               </h3>
-              <p className="text-[var(--ctp-subtext0)]">{feature.description}</p>
+              <p className="text-[var(--ctp-subtext0)]">
+                {feature.description}
+              </p>
             </div>
           ))}
         </div>
@@ -164,7 +175,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-[var(--ctp-text)] mb-4">
-              How GoalFlow Works
+              How Taskly Works
             </h2>
             <p className="text-lg text-[var(--ctp-subtext0)]">
               Simple steps to transform your dreams into reality

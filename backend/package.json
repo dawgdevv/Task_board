@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "taskly-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Task management backend for Taskly",
   "main": "index.js",
   "type": "module",
   "scripts": {
