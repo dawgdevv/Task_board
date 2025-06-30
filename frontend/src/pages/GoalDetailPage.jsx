@@ -405,7 +405,7 @@ const GoalDetailPage = () => {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-[var(--ctp-text)]">
-              Action Plans for "{goal.title}"
+              Action Plans for The current Goal"
             </h2>
             <button
               onClick={() => setShowCreateList(true)}
