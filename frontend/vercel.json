@@ -5,8 +5,11 @@
       "destination": "/index.html"
     }
   ],
-  "buildCommand": "npm run build",
+  "buildCommand": "npm ci && npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": "vite"
+  "installCommand": "npm ci",
+  "framework": "vite",
+  "env": {
+    "VITE_API_URL": "https://taskapiapp-3e68f2f411ec.herokuapp.com"
+  }
 }
