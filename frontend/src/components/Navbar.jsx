@@ -1,12 +1,27 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import ProfileIcon from "./ProfileIcon";
 
-const Navbar = ({ user, onLogout }) => {
+const Navbar = ({ user }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const isAuthPage = ["/login", "/signup"].includes(location.pathname);
   const isHomePage = location.pathname === "/";
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/users/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login");
+    }
+  };
 
   if (isHomePage) {
     return (
@@ -141,7 +156,7 @@ const Navbar = ({ user, onLogout }) => {
 
             {/* Logout Button */}
             <button
-              onClick={onLogout}
+              onClick={handleLogout}
               className="button-danger px-4 py-2 text-sm font-medium" // Use new button-danger class
             >
               Logout

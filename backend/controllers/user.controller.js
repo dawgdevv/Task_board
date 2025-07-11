@@ -42,6 +42,13 @@ export const login = async (req, res) => {
     }
 
     const token = user.generateAuthToken();
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      CSRF: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+      path: "/",
+    });
     res.status(200).json({
       message: "User logged in successfully",
       token,
@@ -54,6 +61,21 @@ export const login = async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    });
+
+    res.status(200).json({ message: "logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "server error", error: error.message });
   }
 };
 
