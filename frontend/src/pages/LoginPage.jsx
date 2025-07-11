@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// Navbar is not typically shown on LoginPage, but if it were, it's already themed.
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -31,6 +30,7 @@ const LoginPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include", // For HTTP-only cookies
           body: JSON.stringify(formData),
         }
       );
@@ -46,7 +46,14 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError("Network error. Please try again.");
+      // Better error handling for connection issues
+      if (error.message.includes("Failed to fetch")) {
+        setError(
+          "Cannot connect to server. Please check if the backend is running."
+        );
+      } else {
+        setError("Network error. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -54,8 +61,6 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      {" "}
-      {/* bg-gray-900 removed, inherits from body */}
       <div className="max-w-md w-full space-y-8">
         <div className="text-center mb-8">
           <button
@@ -86,8 +91,6 @@ const LoginPage = () => {
         </div>
 
         <div className="card p-8 shadow-xl">
-          {" "}
-          {/* Use .card class */}
           <h2 className="text-3xl font-extrabold text-[var(--ctp-text)] text-center mb-8">
             Sign in to your account
           </h2>
