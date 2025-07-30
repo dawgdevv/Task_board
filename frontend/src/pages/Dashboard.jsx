@@ -29,7 +29,7 @@ const Dashboard = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -50,7 +50,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error fetching task lists:", error);
       setError(
-        "Failed to load task lists. Please check if the server is running."
+        "Failed to load task lists. Please check if the server is running.",
       );
     } finally {
       setLoading(false);
@@ -170,7 +170,10 @@ const Dashboard = () => {
                             </span>
                           )}
                           <span className="bg-gray-700 text-gray-200 px-2 py-1 rounded-full text-xs">
-                            Due: {new Date(data.goal.targetDate).toLocaleDateString()}
+                            Due:{" "}
+                            {new Date(
+                              data.goal.targetDate,
+                            ).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
@@ -178,7 +181,7 @@ const Dashboard = () => {
                         onClick={() => navigate(`/goal/${goalId}`)}
                         className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm"
                       >
-                        Manage Goal
+                        Manage Goals
                       </button>
                     </div>
                   </div>
@@ -202,7 +205,7 @@ const Dashboard = () => {
                           navigate(`/goal/${goalId}`);
                         } else {
                           setSelectedListIndex(
-                            taskLists.findIndex((tl) => tl._id === list._id)
+                            taskLists.findIndex((tl) => tl._id === list._id),
                           );
                         }
                       }}
